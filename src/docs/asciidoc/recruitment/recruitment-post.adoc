@@ -1,0 +1,9 @@
+==== http request
+include::{snippets}/recruitment-post/http-request.adoc[]
+
+==== request fields
+include::{snippets}/recruitment-post/request-fields.adoc[]
+
+==== http response
+include::{snippets}/recruitment-post/http-response.adoc[]
+
