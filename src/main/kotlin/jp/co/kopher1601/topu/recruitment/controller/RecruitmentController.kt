@@ -7,6 +7,7 @@ import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.PostMapping
+import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.ResponseStatus
 import org.springframework.web.bind.annotation.RestController
 
@@ -19,7 +20,7 @@ class RecruitmentController @Autowired constructor(
 
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/recruitments")
-    fun post(request: PostRecruitmentRequest) {
+    fun post(@RequestBody request: PostRecruitmentRequest) {
         recruitmentService.post(PostRecruitment.from(request))
     }
 }

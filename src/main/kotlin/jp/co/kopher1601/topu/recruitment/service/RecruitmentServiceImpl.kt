@@ -7,12 +7,15 @@ import jp.co.kopher1601.topu.recruitment.repository.RecruitmentRepository
 import jp.co.kopher1601.topu.recruitment.repository.TechStackRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import org.springframework.transaction.annotation.Transactional
 
 @Service
 class RecruitmentServiceImpl @Autowired constructor(
     private val recruitmentRepository: RecruitmentRepository,
     private val techStackRepository: TechStackRepository,
 ) : RecruitmentService {
+
+    @Transactional
     override fun post(postRecruitment: PostRecruitment) {
 
         val recruitment = Recruitment(recruitmentCategories = postRecruitment.recruitmentCategories!!)
@@ -25,5 +28,6 @@ class RecruitmentServiceImpl @Autowired constructor(
             recruitmentTechStack.makeRelationShip()
         }
 
+        recruitmentRepository.save(recruitment)
     }
 }

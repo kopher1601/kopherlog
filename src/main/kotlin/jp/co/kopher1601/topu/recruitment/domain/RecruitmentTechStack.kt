@@ -5,10 +5,10 @@ import jakarta.persistence.*
 @Entity
 class RecruitmentTechStack(
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     private val recruitment: Recruitment,
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     private val techStack: TechStack,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
