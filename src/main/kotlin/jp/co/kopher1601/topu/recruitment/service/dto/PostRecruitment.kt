@@ -1,9 +1,9 @@
-package jp.co.kopher1601.topu.recruitment.service
+package jp.co.kopher1601.topu.recruitment.service.dto
 
 import jakarta.validation.constraints.NotNull
 import jp.co.kopher1601.topu.recruitment.domain.ProgressMethods
 import jp.co.kopher1601.topu.recruitment.domain.RecruitmentCategories
-import jp.co.kopher1601.topu.recruitment.request.PostRecruitmentRequest
+import jp.co.kopher1601.topu.recruitment.controller.dto.PostRecruitmentRequest
 import java.time.LocalDate
 
 data class PostRecruitment(

@@ -1,7 +1,7 @@
 package jp.co.kopher1601.topu.recruitment.controller
 
-import jp.co.kopher1601.topu.recruitment.request.PostRecruitmentRequest
-import jp.co.kopher1601.topu.recruitment.service.PostRecruitment
+import jp.co.kopher1601.topu.recruitment.controller.dto.PostRecruitmentRequest
+import jp.co.kopher1601.topu.recruitment.service.dto.PostRecruitment
 import jp.co.kopher1601.topu.recruitment.service.RecruitmentService
 import org.slf4j.LoggerFactory
 import org.springframework.beans.factory.annotation.Autowired

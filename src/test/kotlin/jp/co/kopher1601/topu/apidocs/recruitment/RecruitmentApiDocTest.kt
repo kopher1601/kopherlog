@@ -3,7 +3,7 @@ package jp.co.kopher1601.topu.apidocs.recruitment
 import com.fasterxml.jackson.databind.ObjectMapper
 import jp.co.kopher1601.topu.recruitment.domain.ProgressMethods
 import jp.co.kopher1601.topu.recruitment.domain.RecruitmentCategories
-import jp.co.kopher1601.topu.recruitment.request.PostRecruitmentRequest
+import jp.co.kopher1601.topu.recruitment.controller.dto.PostRecruitmentRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.beans.factory.annotation.Autowired
