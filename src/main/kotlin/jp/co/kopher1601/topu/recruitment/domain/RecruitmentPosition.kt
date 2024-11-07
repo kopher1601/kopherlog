@@ -3,20 +3,19 @@ package jp.co.kopher1601.topu.recruitment.domain
 import jakarta.persistence.*
 
 @Entity
-class RecruitmentTechStack(
+class RecruitmentPosition(
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
     private val recruitment: Recruitment,
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
-    private val techStack: TechStack,
+    private val position: Position,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    private val id: Long? = null,
 ): BaseEntity() {
-
     fun makeRelationship() {
-        this.recruitment.recruitmentTechStacks?.add(this)
-        this.techStack.recruitmentTechStacks.add(this)
+        this.position.recruitmentPositions.add(this)
+        this.recruitment.recruitmentPositions.add(this)
     }
 }

@@ -3,7 +3,7 @@ POST http://localhost:8080/recruitments
 Content-Type: application/json
 
 {
-  "recruitmentCategories": "PROJECT",
+  "recruitmentCategory": "PROJECT",
   "progressMethods": "ALL",
   "techStacks": [
     "Java",

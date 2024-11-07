@@ -2,16 +2,16 @@ package jp.co.kopher1601.topu.recruitment.service.dto
 
 import jakarta.validation.constraints.NotNull
 import jp.co.kopher1601.topu.recruitment.domain.ProgressMethods
-import jp.co.kopher1601.topu.recruitment.domain.RecruitmentCategories
+import jp.co.kopher1601.topu.recruitment.domain.RecruitmentCategory
 import jp.co.kopher1601.topu.recruitment.controller.dto.PostRecruitmentRequest
 import java.time.LocalDate
 
 data class PostRecruitment(
     @field:NotNull
-    val recruitmentCategories: RecruitmentCategories?,
+    val recruitmentCategory: RecruitmentCategory?,
     val progressMethods: ProgressMethods?,
     val techStacks: List<String>?,
-    val recruitmentPositions: List<String>?,
+    val positions: List<String>?,
     val numberOfPeople: Int?,
     val progressPeriod: Int?,
     val recruitmentDeadline: LocalDate?,
@@ -23,7 +23,7 @@ data class PostRecruitment(
     companion object {
         fun from(request: PostRecruitmentRequest): PostRecruitment {
             return PostRecruitment(
-                request.recruitmentCategories,
+                request.recruitmentCategory,
                 request.progressMethods,
                 request.techStacks,
                 request.recruitmentPositions,

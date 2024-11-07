@@ -1,8 +1,7 @@
 package jp.co.kopher1601.topu.recruitment.service
 
-import jp.co.kopher1601.topu.recruitment.domain.Recruitment
-import jp.co.kopher1601.topu.recruitment.domain.RecruitmentTechStack
-import jp.co.kopher1601.topu.recruitment.domain.TechStack
+import jp.co.kopher1601.topu.recruitment.domain.*
+import jp.co.kopher1601.topu.recruitment.repository.PositionRepository
 import jp.co.kopher1601.topu.recruitment.repository.RecruitmentRepository
 import jp.co.kopher1601.topu.recruitment.repository.TechStackRepository
 import jp.co.kopher1601.topu.recruitment.service.dto.PostRecruitment
@@ -14,13 +13,14 @@ import org.springframework.transaction.annotation.Transactional
 class RecruitmentServiceImpl @Autowired constructor(
     private val recruitmentRepository: RecruitmentRepository,
     private val techStackRepository: TechStackRepository,
+    private val positionRepository: PositionRepository,
 ) : RecruitmentService {
 
     @Transactional
     override fun post(postRecruitment: PostRecruitment) {
 
         val recruitment = Recruitment(
-            recruitmentCategories = postRecruitment.recruitmentCategories!!,
+            recruitmentCategory = postRecruitment.recruitmentCategory!!,
             progressMethods = postRecruitment.progressMethods!!,
             content = postRecruitment.content!!,
             subject = postRecruitment.subject!!,
@@ -35,7 +35,14 @@ class RecruitmentServiceImpl @Autowired constructor(
                 ?: TechStack(technologyName = techStack)
         }?.forEach { techStack ->
             val recruitmentTechStack = RecruitmentTechStack(recruitment, techStack)
-            recruitmentTechStack.makeRelationShip()
+            recruitmentTechStack.makeRelationship()
+        }
+
+        postRecruitment.positions?.map { positionName ->
+            positionRepository.findByPositionName(positionName) ?: Position(positionName = positionName)
+        }?.forEach { position ->
+            val recruitmentPosition = RecruitmentPosition(recruitment, position)
+            recruitmentPosition.makeRelationship()
         }
 
         recruitmentRepository.save(recruitment)

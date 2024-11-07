@@ -2,7 +2,7 @@ package jp.co.kopher1601.topu.apidocs.recruitment
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import jp.co.kopher1601.topu.recruitment.domain.ProgressMethods
-import jp.co.kopher1601.topu.recruitment.domain.RecruitmentCategories
+import jp.co.kopher1601.topu.recruitment.domain.RecruitmentCategory
 import jp.co.kopher1601.topu.recruitment.controller.dto.PostRecruitmentRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
@@ -34,7 +34,7 @@ class RecruitmentApiDocTest @Autowired constructor(
     fun postRecruitment() {
         // given
         val request = PostRecruitmentRequest(
-            RecruitmentCategories.STUDY,
+            RecruitmentCategory.STUDY,
             ProgressMethods.ALL,
             listOf("Kotlin", "Spring", "JPA"),
             listOf("バックエンド", "SRE", "アプリケーション開発者"),
@@ -60,7 +60,7 @@ class RecruitmentApiDocTest @Autowired constructor(
                     preprocessRequest(prettyPrint()),
                     preprocessResponse(prettyPrint()),
                     requestFields(
-                        fieldWithPath("recruitmentCategories").description("응모 카테고리"),
+                        fieldWithPath("recruitmentCategory").description("응모 카테고리"),
                         fieldWithPath("progressMethods").description("응모 방법"),
                         fieldWithPath("techStacks").description("기술 스택"),
                         fieldWithPath("recruitmentPositions").description("응모 포지션"),

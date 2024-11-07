@@ -7,7 +7,10 @@ import java.time.LocalDate
 class Recruitment(
 
     @OneToMany(mappedBy = "recruitment", cascade = [CascadeType.ALL], orphanRemoval = true)
-    val recruitmentTechStacks: MutableList<RecruitmentTechStack>? = mutableListOf(),
+    val recruitmentPositions: MutableList<RecruitmentPosition> = mutableListOf(),
+
+    @OneToMany(mappedBy = "recruitment", cascade = [CascadeType.ALL], orphanRemoval = true)
+    val recruitmentTechStacks: MutableList<RecruitmentTechStack> = mutableListOf(),
 
     @Lob
     private val content: String,
@@ -28,10 +31,8 @@ class Recruitment(
     private val progressMethods: ProgressMethods,
 
     @Enumerated(EnumType.STRING)
-    private val recruitmentCategories: RecruitmentCategories,
+    private val recruitmentCategory: RecruitmentCategory,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
-) {
-
-}
+): BaseEntity()

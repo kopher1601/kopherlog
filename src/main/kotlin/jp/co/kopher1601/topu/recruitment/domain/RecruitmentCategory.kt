@@ -1,6 +1,6 @@
 package jp.co.kopher1601.topu.recruitment.domain
 
-enum class RecruitmentCategories(
+enum class RecruitmentCategory(
     val category: String,
 ) {
     PROJECT("プロジェクト"),
