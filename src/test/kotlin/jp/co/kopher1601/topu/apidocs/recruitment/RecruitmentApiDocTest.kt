@@ -1,8 +1,8 @@
 package jp.co.kopher1601.topu.apidocs.recruitment
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jp.co.kopher1601.topu.recruitment.domain.ProgressMethods
-import jp.co.kopher1601.topu.recruitment.domain.RecruitmentCategory
+import jp.co.kopher1601.topu.recruitment.domain.enums.ProgressMethods
+import jp.co.kopher1601.topu.recruitment.domain.enums.RecruitmentCategory
 import jp.co.kopher1601.topu.recruitment.controller.dto.PostRecruitmentRequest
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test

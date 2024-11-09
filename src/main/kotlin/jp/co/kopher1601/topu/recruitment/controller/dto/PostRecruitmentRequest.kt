@@ -1,7 +1,7 @@
 package jp.co.kopher1601.topu.recruitment.controller.dto
 
-import jp.co.kopher1601.topu.recruitment.domain.ProgressMethods
-import jp.co.kopher1601.topu.recruitment.domain.RecruitmentCategory
+import jp.co.kopher1601.topu.recruitment.domain.enums.ProgressMethods
+import jp.co.kopher1601.topu.recruitment.domain.enums.RecruitmentCategory
 import java.time.LocalDate
 
 data class PostRecruitmentRequest(
