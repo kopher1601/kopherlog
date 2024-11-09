@@ -9,7 +9,7 @@ class RecruitmentPosition(
     private val recruitment: Recruitment,
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
-    private val position: Position,
+    val position: Position,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private val id: Long? = null,

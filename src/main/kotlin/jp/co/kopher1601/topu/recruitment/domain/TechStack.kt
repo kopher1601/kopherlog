@@ -14,7 +14,7 @@ class TechStack(
     val recruitmentTechStacks: MutableList<RecruitmentTechStack> = mutableListOf(),
 
     @Column(unique = true, nullable = false, length = 50)
-    private val technologyName: String,
+    val technologyName: String,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,

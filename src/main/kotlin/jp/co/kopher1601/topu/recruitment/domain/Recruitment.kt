@@ -15,25 +15,25 @@ class Recruitment(
     val recruitmentTechStacks: MutableList<RecruitmentTechStack> = mutableListOf(),
 
     @Lob
-    private val content: String,
+    val content: String,
 
-    private val pageViews: Long = 0L,
+    val pageViews: Long = 0L,
 
-    private val subject: String,
+    val subject: String,
 
-    private val contract: String,
+    val contract: String,
 
-    private val recruitmentDeadLine: LocalDate,
+    val recruitmentDeadLine: LocalDate,
 
-    private val progressPeriod: Int,
+    val progressPeriod: Int,
 
-    private val numberOfPeople: Int,
-
-    @Enumerated(EnumType.STRING)
-    private val progressMethods: ProgressMethods,
+    val numberOfPeople: Int,
 
     @Enumerated(EnumType.STRING)
-    private val recruitmentCategory: RecruitmentCategory,
+    val progressMethods: ProgressMethods,
+
+    @Enumerated(EnumType.STRING)
+    val recruitmentCategory: RecruitmentCategory,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,

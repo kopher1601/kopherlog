@@ -9,7 +9,7 @@ class RecruitmentTechStack(
     private val recruitment: Recruitment,
 
     @ManyToOne(fetch = FetchType.LAZY, cascade = [CascadeType.PERSIST])
-    private val techStack: TechStack,
+    val techStack: TechStack,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null,

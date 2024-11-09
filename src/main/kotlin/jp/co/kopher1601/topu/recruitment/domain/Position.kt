@@ -9,7 +9,7 @@ class Position(
     val recruitmentPositions: MutableList<RecruitmentPosition> = mutableListOf(),
 
     @Column(nullable = false, unique = true, length = 50)
-    private val positionName: String,
+    val positionName: String,
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,

@@ -5,7 +5,10 @@ import jp.co.kopher1601.topu.recruitment.repository.PositionRepository
 import jp.co.kopher1601.topu.recruitment.repository.RecruitmentRepository
 import jp.co.kopher1601.topu.recruitment.repository.TechStackRepository
 import jp.co.kopher1601.topu.recruitment.service.dto.PostRecruitment
+import jp.co.kopher1601.topu.recruitment.service.dto.RecruitmentResponse
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.crossstore.ChangeSetPersister.NotFoundException
+import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 
@@ -46,5 +49,12 @@ class RecruitmentServiceImpl @Autowired constructor(
         }
 
         recruitmentRepository.save(recruitment)
+    }
+
+    override fun getRecruitment(recruitmentId: Long): RecruitmentResponse {
+        val foundRecruitment = recruitmentRepository.findByIdOrNull(recruitmentId)
+            ?: throw NotFoundException()
+
+        return RecruitmentResponse.from(foundRecruitment)
     }
 }
