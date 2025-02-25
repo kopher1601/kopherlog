@@ -21,7 +21,9 @@ func NewPostController() PostController {
 func (p *postController) PostCreate(ctx *gin.Context) {
 	request := &domain.PostCreate{}
 	if err := ctx.ShouldBindJSON(request); err != nil {
-		ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+		response := domain.GenerateErrorResponse(err)
+		ctx.JSON(http.StatusBadRequest, response)
+		return
 	}
 
 	log.Println("request =>", request)
