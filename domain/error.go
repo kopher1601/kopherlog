@@ -5,6 +5,12 @@ import (
 )
 
 type ErrorResponse struct {
+	Code        int               `json:"code"`
+	Message     string            `json:"message"`
+	Validations []ValidationError `json:"validations"`
+}
+
+type ValidationError struct {
 	Field   string `json:"field"`
 	Message string `json:"message"`
 }
@@ -13,8 +19,8 @@ var customMessages = map[string]string{
 	"required": "必須です。",
 }
 
-func GenerateErrorResponse(error error) []ErrorResponse {
-	var errors []ErrorResponse
+func GenerateValidationErrors(error error) []ValidationError {
+	var validations []ValidationError
 	if validationErrors, ok := error.(validator.ValidationErrors); ok {
 		for _, e := range validationErrors {
 			var msg string
@@ -24,11 +30,11 @@ func GenerateErrorResponse(error error) []ErrorResponse {
 				msg = customMsg
 			}
 
-			errors = append(errors, ErrorResponse{
+			validations = append(validations, ValidationError{
 				Field:   e.Field(),
 				Message: msg,
 			})
 		}
 	}
-	return errors
+	return validations
 }

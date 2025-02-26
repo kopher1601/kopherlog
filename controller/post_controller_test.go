@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
 	"kopherlog/domain"
+	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -49,11 +50,12 @@ func Test_PostController_PostCreate_Title_Required(t *testing.T) {
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
 
-	var errors []domain.ErrorResponse
+	log.Println(resp.Body.String())
+	var errors domain.ErrorResponse
 	_ = json.NewDecoder(resp.Body).Decode(&errors)
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
-	assert.Equal(t, "Title", errors[0].Field)
-	assert.Equal(t, "必須です。", errors[0].Message)
+	assert.Equal(t, "Title", errors.Validations[0].Field)
+	assert.Equal(t, "必須です。", errors.Validations[0].Message)
 }
 
 func Test_PostController_PostCreate_Content_Required(t *testing.T) {
@@ -73,11 +75,11 @@ func Test_PostController_PostCreate_Content_Required(t *testing.T) {
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
 
-	var errors []domain.ErrorResponse
+	var errors domain.ErrorResponse
 	_ = json.NewDecoder(resp.Body).Decode(&errors)
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
-	assert.Equal(t, "Content", errors[0].Field)
-	assert.Equal(t, "必須です。", errors[0].Message)
+	assert.Equal(t, "Content", errors.Validations[0].Field)
+	assert.Equal(t, "必須です。", errors.Validations[0].Message)
 }
 
 func Test_PostController_PostCreate_Title_Content_Required(t *testing.T) {
@@ -97,11 +99,12 @@ func Test_PostController_PostCreate_Title_Content_Required(t *testing.T) {
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
 
-	var errors []domain.ErrorResponse
+	log.Println(resp.Body.String())
+	var errors domain.ErrorResponse
 	_ = json.NewDecoder(resp.Body).Decode(&errors)
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
-	assert.Equal(t, "Title", errors[0].Field)
-	assert.Equal(t, "必須です。", errors[0].Message)
-	assert.Equal(t, "Content", errors[1].Field)
-	assert.Equal(t, "必須です。", errors[1].Message)
+	assert.Equal(t, "Title", errors.Validations[0].Field)
+	assert.Equal(t, "必須です。", errors.Validations[0].Message)
+	assert.Equal(t, "Content", errors.Validations[1].Field)
+	assert.Equal(t, "必須です。", errors.Validations[1].Message)
 }
