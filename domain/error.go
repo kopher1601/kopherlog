@@ -19,7 +19,7 @@ var customMessages = map[string]string{
 	"required": "必須です。",
 }
 
-func GenerateValidationErrors(error error) []ValidationError {
+func (e *ErrorResponse) AddValidationErrors(error error) {
 	var validations []ValidationError
 	if validationErrors, ok := error.(validator.ValidationErrors); ok {
 		for _, e := range validationErrors {
@@ -36,5 +36,5 @@ func GenerateValidationErrors(error error) []ValidationError {
 			})
 		}
 	}
-	return validations
+	e.Validations = validations
 }

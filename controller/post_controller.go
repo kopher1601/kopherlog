@@ -21,12 +21,11 @@ func NewPostController() PostController {
 func (p *postController) PostCreate(ctx *gin.Context) {
 	request := &domain.PostCreate{}
 	if err := ctx.ShouldBindJSON(request); err != nil {
-		validationErrors := domain.GenerateValidationErrors(err)
 		errorResponse := domain.ErrorResponse{
-			Code:        http.StatusBadRequest,
-			Message:     "間違ったリクエストです。",
-			Validations: validationErrors,
+			Code:    http.StatusBadRequest,
+			Message: "間違ったリクエストです。",
 		}
+		errorResponse.AddValidationErrors(err)
 		ctx.JSON(http.StatusBadRequest, errorResponse)
 		return
 	}
