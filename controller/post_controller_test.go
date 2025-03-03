@@ -4,42 +4,31 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"entgo.io/ent/dialect/sql"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/assert"
+	"kopherlog/config"
 	db "kopherlog/db"
 	"kopherlog/domain"
 	"kopherlog/ent"
-	"kopherlog/ent/enttest"
 	"kopherlog/repository"
 	"kopherlog/service"
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
 
-func connectDB() *sql.Driver {
-	database, err := sql.Open("mysql", "kopherlog:kopherlog@tcp(127.0.0.1:3306)/kopherlog?parseTime=true")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return database
-}
+func TestMain(m *testing.M) {
+	config.Initialize()
+	code := m.Run()
+	os.Exit(code)
 
-func getClient(t *testing.T, db *sql.Driver) *ent.Client {
-	drv := sql.OpenDB("mysql", db.DB())
-	options := []enttest.Option{
-		enttest.WithOptions(ent.Log(t.Log), ent.Driver(drv)),
-	}
-	client := enttest.NewClient(t, options...)
-	return client
 }
 
 func Test_PostController_Post_Save(t *testing.T) {
-	context := context.Background()
-	client := getClient(t, connectDB())
+	client := config.SetupDB(t)
 	r := gin.Default()
 
 	postCreate := &domain.PostCreate{
@@ -53,6 +42,7 @@ func Test_PostController_Post_Save(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
 	req.Header.Set("Content-Type", "application/json")
 
+	context := context.Background()
 	db.WithTx(context, client, func(tx *ent.Tx) error {
 		postRepository := repository.NewPostRepository(tx.Client())
 		postService := service.NewPostService(postRepository)
@@ -69,7 +59,7 @@ func Test_PostController_Post_Save(t *testing.T) {
 }
 
 func Test_PostController_PostCreate_Title_Required(t *testing.T) {
-	client := getClient(t, connectDB())
+	client := config.SetupDB(t)
 
 	r := gin.Default()
 	postCreate := &domain.PostCreate{
@@ -98,7 +88,7 @@ func Test_PostController_PostCreate_Title_Required(t *testing.T) {
 }
 
 func Test_PostController_PostCreate_Content_Required(t *testing.T) {
-	client := getClient(t, connectDB())
+	client := config.SetupDB(t)
 	r := gin.Default()
 
 	postCreate := &domain.PostCreate{
@@ -126,7 +116,7 @@ func Test_PostController_PostCreate_Content_Required(t *testing.T) {
 }
 
 func Test_PostController_PostCreate_Title_Content_Required(t *testing.T) {
-	client := getClient(t, connectDB())
+	client := config.SetupDB(t)
 	r := gin.Default()
 
 	postCreate := &domain.PostCreate{
