@@ -2,18 +2,46 @@ package controller
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
+	"entgo.io/ent/dialect/sql"
 	"github.com/gin-gonic/gin"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/stretchr/testify/assert"
+	db "kopherlog/db"
 	"kopherlog/domain"
+	"kopherlog/ent"
+	"kopherlog/ent/enttest"
+	"kopherlog/repository"
+	"kopherlog/service"
 	"log"
 	"net/http"
 	"net/http/httptest"
 	"testing"
 )
 
-func Test_PostController_Post(t *testing.T) {
+func connectDB() *sql.Driver {
+	database, err := sql.Open("mysql", "kopherlog:kopherlog@tcp(127.0.0.1:3306)/kopherlog?parseTime=true")
+	if err != nil {
+		log.Fatal(err)
+	}
+	return database
+}
+
+func getClient(t *testing.T, db *sql.Driver) *ent.Client {
+	drv := sql.OpenDB("mysql", db.DB())
+	options := []enttest.Option{
+		enttest.WithOptions(ent.Log(t.Log), ent.Driver(drv)),
+	}
+	client := enttest.NewClient(t, options...)
+	return client
+}
+
+func Test_PostController_Post_Save(t *testing.T) {
+	context := context.Background()
+	client := getClient(t, connectDB())
 	r := gin.Default()
+
 	postCreate := &domain.PostCreate{
 		Title:   "吉祥寺マンション",
 		Content: "吉祥寺マンション購入します。",
@@ -25,15 +53,24 @@ func Test_PostController_Post(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
 	req.Header.Set("Content-Type", "application/json")
 
-	postController := NewPostController()
-	r.POST("/posts", postController.PostCreate)
-	r.ServeHTTP(resp, req)
+	db.WithTx(context, client, func(tx *ent.Tx) error {
+		postRepository := repository.NewPostRepository(tx.Client())
+		postService := service.NewPostService(postRepository)
+		postController := NewPostController(postService)
+		r.POST("/posts", postController.PostCreate)
+		r.ServeHTTP(resp, req)
+		posts, err := postRepository.FindAll()
+		assert.NoError(t, err)
+		assert.Equal(t, http.StatusCreated, resp.Code)
+		assert.Equal(t, 1, len(posts))
+		return nil
+	})
 
-	assert.Equal(t, http.StatusOK, resp.Code)
-	assert.Equal(t, "Hello World", resp.Body.String())
 }
 
 func Test_PostController_PostCreate_Title_Required(t *testing.T) {
+	client := getClient(t, connectDB())
+
 	r := gin.Default()
 	postCreate := &domain.PostCreate{
 		Title:   "",
@@ -46,7 +83,9 @@ func Test_PostController_PostCreate_Title_Required(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
 	req.Header.Set("Content-Type", "application/json")
 
-	postController := NewPostController()
+	postRepository := repository.NewPostRepository(client)
+	postService := service.NewPostService(postRepository)
+	postController := NewPostController(postService)
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
 
@@ -59,7 +98,9 @@ func Test_PostController_PostCreate_Title_Required(t *testing.T) {
 }
 
 func Test_PostController_PostCreate_Content_Required(t *testing.T) {
+	client := getClient(t, connectDB())
 	r := gin.Default()
+
 	postCreate := &domain.PostCreate{
 		Title:   "吉祥寺マンション",
 		Content: "",
@@ -71,7 +112,9 @@ func Test_PostController_PostCreate_Content_Required(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
 	req.Header.Set("Content-Type", "application/json")
 
-	postController := NewPostController()
+	postRepository := repository.NewPostRepository(client)
+	postService := service.NewPostService(postRepository)
+	postController := NewPostController(postService)
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
 
@@ -83,7 +126,9 @@ func Test_PostController_PostCreate_Content_Required(t *testing.T) {
 }
 
 func Test_PostController_PostCreate_Title_Content_Required(t *testing.T) {
+	client := getClient(t, connectDB())
 	r := gin.Default()
+
 	postCreate := &domain.PostCreate{
 		Title:   "",
 		Content: "",
@@ -95,7 +140,9 @@ func Test_PostController_PostCreate_Title_Content_Required(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
 	req.Header.Set("Content-Type", "application/json")
 
-	postController := NewPostController()
+	postRepository := repository.NewPostRepository(client)
+	postService := service.NewPostService(postRepository)
+	postController := NewPostController(postService)
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
 

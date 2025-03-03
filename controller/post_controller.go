@@ -3,7 +3,7 @@ package controller
 import (
 	"github.com/gin-gonic/gin"
 	"kopherlog/domain"
-	"log"
+	"kopherlog/service"
 	"net/http"
 )
 
@@ -12,16 +12,17 @@ type PostController interface {
 }
 
 type postController struct {
+	postService service.PostService
 }
 
-func NewPostController() PostController {
-	return &postController{}
+func NewPostController(postService service.PostService) PostController {
+	return &postController{postService: postService}
 }
 
 func (p *postController) PostCreate(ctx *gin.Context) {
 	request := &domain.PostCreate{}
 	if err := ctx.ShouldBindJSON(request); err != nil {
-		errorResponse := domain.ErrorResponse{
+		errorResponse := &domain.ErrorResponse{
 			Code:    http.StatusBadRequest,
 			Message: "間違ったリクエストです。",
 		}
@@ -30,7 +31,16 @@ func (p *postController) PostCreate(ctx *gin.Context) {
 		return
 	}
 
-	log.Println("request =>", request)
-
-	ctx.String(http.StatusOK, "Hello World")
+	err := p.postService.Write(request)
+	if err != nil {
+		// TODO constructor 사용
+		errorResponse := &domain.ErrorResponse{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+		ctx.JSON(http.StatusInternalServerError, errorResponse)
+		return
+	}
+	ctx.Status(http.StatusCreated)
+	return
 }
