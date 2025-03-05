@@ -31,7 +31,7 @@ func (p *postController) PostCreate(ctx *gin.Context) {
 		return
 	}
 
-	err := p.postService.Write(request)
+	err := p.postService.Write(ctx, request)
 	if err != nil {
 		// TODO constructor 사용
 		errorResponse := &domain.ErrorResponse{

@@ -4,14 +4,9 @@ import (
 	"context"
 	"fmt"
 	"kopherlog/ent"
-	"os"
 )
 
-func WithTx(ctx context.Context, client *ent.Client, testTx *ent.Tx, fn func(tx *ent.Tx) error) error {
-	if os.Getenv("ENV") == "TEST" {
-		fn(testTx)
-		return testTx.Rollback()
-	}
+func WithTx(ctx context.Context, client *ent.Client, fn func(tx *ent.Tx) error) error {
 	tx, err := client.Tx(ctx)
 	if err != nil {
 		return err
@@ -29,10 +24,6 @@ func WithTx(ctx context.Context, client *ent.Client, testTx *ent.Tx, fn func(tx 
 		}
 		return err
 	}
-
-	//if os.Getenv("ENV") == "TEST" {
-	//	return tx.Rollback()
-	//}
 
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("committing transaction: %w", err)
