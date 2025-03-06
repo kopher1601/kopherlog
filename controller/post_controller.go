@@ -64,6 +64,5 @@ func (p *postController) Get(ctx *gin.Context) {
 		}
 		ctx.JSON(errorResponse.Code, errorResponse)
 	}
-	// Response 용 Struct 가 필요
-	ctx.JSON(http.StatusOK, gin.H{"data": result})
+	ctx.JSON(http.StatusOK, result)
 }

@@ -37,3 +37,28 @@ func TestPostService_Write(t *testing.T) {
 	assert.Equal(t, 1, len(posts))
 	assert.Equal(t, "吉祥寺マンション", posts[0].Title)
 }
+
+func TestPostService_Get(t *testing.T) {
+	// given
+	ctx := context.Background()
+	client := config.SetupDB(t)
+	postRepository := repository.NewPostRepository(client)
+	postService := NewPostService(postRepository)
+	postCreate := &domain.PostCreate{
+		Title:   "吉祥寺マンション",
+		Content: "吉祥寺マンション購入します。",
+	}
+	postService.Write(ctx, postCreate)
+	posts, _ := postRepository.FindAll()
+	t.Cleanup(func() {
+		postRepository.DeleteAll(ctx)
+	})
+
+	// when
+	foundPost, err := postService.Get(ctx, posts[0].ID)
+
+	// then
+	assert.NoError(t, err)
+	assert.Equal(t, "吉祥寺マンション", foundPost.Title)
+	assert.Equal(t, "吉祥寺マンション購入します。", foundPost.Content)
+}

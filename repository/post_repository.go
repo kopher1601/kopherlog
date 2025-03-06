@@ -2,7 +2,6 @@ package repository
 
 import (
 	"context"
-	"github.com/gin-gonic/gin"
 	"kopherlog/db"
 	"kopherlog/domain"
 	"kopherlog/ent"
@@ -11,10 +10,10 @@ import (
 )
 
 type PostRepository interface {
-	Save(ctx context.Context, post *domain.Post) error
+	Save(ctx context.Context, post *domain.Post) (*domain.Post, error)
 	FindAll() ([]*ent.Post, error)
 	DeleteAll(ctx context.Context) error
-	FindByID(ctx *gin.Context, id int) (*ent.Post, error)
+	FindByID(ctx context.Context, id int) (*ent.Post, error)
 }
 
 type postRepository struct {
@@ -33,14 +32,24 @@ func NewPostRepository(ent *ent.Client) PostRepository {
 	return &postRepository{ent: ent}
 }
 
-func (p *postRepository) Save(ctx context.Context, post *domain.Post) error {
-	return db.WithTx(ctx, p.ent, func(tx *ent.Tx) error {
-		_, err := tx.Post.Create().SetTitle(post.Title).SetContent(post.Content).Save(ctx)
+func (p *postRepository) Save(ctx context.Context, post *domain.Post) (*domain.Post, error) {
+	var response domain.Post
+	err := db.WithTx(ctx, p.ent, func(tx *ent.Tx) error {
+		savedPost, err := tx.Post.Create().SetTitle(post.Title).SetContent(post.Content).Save(ctx)
 		if err != nil {
 			return err
 		}
+		response = domain.Post{
+			ID:      savedPost.ID,
+			Title:   savedPost.Title,
+			Content: savedPost.Content,
+		}
 		return nil
 	})
+	if err != nil {
+		return nil, err
+	}
+	return &response, nil
 }
 
 func (p *postRepository) FindAll() ([]*ent.Post, error) {
@@ -51,7 +60,7 @@ func (p *postRepository) FindAll() ([]*ent.Post, error) {
 	return posts, nil
 }
 
-func (p *postRepository) FindByID(ctx *gin.Context, id int) (*ent.Post, error) {
+func (p *postRepository) FindByID(ctx context.Context, id int) (*ent.Post, error) {
 	foundPost, err := p.ent.Post.Query().Where(post.ID(id)).First(ctx)
 	if err != nil {
 		log.Println("postRepository.FindByID:", err)
