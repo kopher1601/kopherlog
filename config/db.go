@@ -11,7 +11,6 @@ import (
 )
 
 func SetupDB(t *testing.T) *ent.Client {
-	Initialize()
 	env := os.Getenv("ENV")
 	driver := os.Getenv("DB_DRIVER")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True",

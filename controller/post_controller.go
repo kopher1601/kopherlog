@@ -11,6 +11,7 @@ import (
 type PostController interface {
 	PostCreate(ctx *gin.Context)
 	Get(ctx *gin.Context)
+	GetAll(ctx *gin.Context)
 }
 
 type postController struct {
@@ -55,6 +56,7 @@ func (p *postController) Get(ctx *gin.Context) {
 			Message: err.Error(),
 		}
 		ctx.JSON(errorResponse.Code, errorResponse)
+		return
 	}
 	result, err := p.postService.Get(ctx, postID)
 	if err != nil {
@@ -63,6 +65,20 @@ func (p *postController) Get(ctx *gin.Context) {
 			Message: err.Error(),
 		}
 		ctx.JSON(errorResponse.Code, errorResponse)
+		return
 	}
 	ctx.JSON(http.StatusOK, result)
+}
+
+func (p *postController) GetAll(ctx *gin.Context) {
+	posts, err := p.postService.GetAll()
+	if err != nil {
+		errorResponse := &domain.ErrorResponse{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+		ctx.JSON(errorResponse.Code, errorResponse)
+		return
+	}
+	ctx.JSON(http.StatusOK, posts)
 }

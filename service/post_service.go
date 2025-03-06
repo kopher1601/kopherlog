@@ -9,6 +9,7 @@ import (
 type PostService interface {
 	Write(ctx context.Context, postCreate *domain.PostCreate) error
 	Get(ctx context.Context, id int) (*domain.PostResponse, error)
+	GetAll() ([]*domain.PostResponse, error)
 }
 
 type postService struct {
@@ -34,7 +35,24 @@ func (p *postService) Get(ctx context.Context, id int) (*domain.PostResponse, er
 		return nil, err
 	}
 	return &domain.PostResponse{
+		ID:      post.ID,
 		Title:   post.Title,
 		Content: post.Content,
 	}, nil
+}
+
+func (p *postService) GetAll() ([]*domain.PostResponse, error) {
+	posts, err := p.postRepository.FindAll()
+	if err != nil {
+		return nil, err
+	}
+	var postResponses []*domain.PostResponse
+	for _, post := range posts {
+		postResponses = append(postResponses, &domain.PostResponse{
+			ID:      post.ID,
+			Title:   post.Title,
+			Content: post.Content,
+		})
+	}
+	return postResponses, nil
 }

@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"kopherlog/config"
 	"kopherlog/domain"
@@ -15,8 +16,18 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"os"
 	"testing"
 )
+
+func TestMain(m *testing.M) {
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file", err)
+	}
+	code := m.Run()
+	os.Exit(code)
+}
 
 func Test_PostController_Post_Save(t *testing.T) {
 	ctx := context.Background()
