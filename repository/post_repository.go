@@ -2,15 +2,19 @@ package repository
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"kopherlog/db"
 	"kopherlog/domain"
 	"kopherlog/ent"
+	"kopherlog/ent/post"
+	"log"
 )
 
 type PostRepository interface {
 	Save(ctx context.Context, post *domain.Post) error
 	FindAll() ([]*ent.Post, error)
 	DeleteAll(ctx context.Context) error
+	FindByID(ctx *gin.Context, id int) (*ent.Post, error)
 }
 
 type postRepository struct {
@@ -45,4 +49,13 @@ func (p *postRepository) FindAll() ([]*ent.Post, error) {
 		return nil, err
 	}
 	return posts, nil
+}
+
+func (p *postRepository) FindByID(ctx *gin.Context, id int) (*ent.Post, error) {
+	foundPost, err := p.ent.Post.Query().Where(post.ID(id)).First(ctx)
+	if err != nil {
+		log.Println("postRepository.FindByID:", err)
+		return nil, err
+	}
+	return foundPost, nil
 }

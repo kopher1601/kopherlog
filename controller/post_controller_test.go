@@ -39,7 +39,7 @@ func Test_PostController_Post_Save(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
 	req.Header.Set("Content-Type", "application/json")
 	postRepository := repository.NewPostRepository(client)
-	postService := service.NewPostService(ctx, postRepository)
+	postService := service.NewPostService(postRepository)
 	postController := NewPostController(postService)
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)

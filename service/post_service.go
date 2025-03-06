@@ -2,21 +2,22 @@ package service
 
 import (
 	"context"
+	"github.com/gin-gonic/gin"
 	"kopherlog/domain"
 	"kopherlog/repository"
 )
 
 type PostService interface {
 	Write(ctx context.Context, postCreate *domain.PostCreate) error
+	Get(ctx *gin.Context, id int) (*domain.PostResponse, error)
 }
 
 type postService struct {
-	ctx            context.Context
 	postRepository repository.PostRepository
 }
 
-func NewPostService(ctx context.Context, postRepository repository.PostRepository) PostService {
-	return &postService{ctx: ctx, postRepository: postRepository}
+func NewPostService(postRepository repository.PostRepository) PostService {
+	return &postService{postRepository: postRepository}
 }
 
 func (p *postService) Write(ctx context.Context, postCreate *domain.PostCreate) error {
@@ -26,4 +27,15 @@ func (p *postService) Write(ctx context.Context, postCreate *domain.PostCreate) 
 		return err
 	}
 	return nil
+}
+
+func (p *postService) Get(ctx *gin.Context, id int) (*domain.PostResponse, error) {
+	post, err := p.postRepository.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return &domain.PostResponse{
+		Title:   post.Title,
+		Content: post.Content,
+	}, nil
 }

@@ -5,6 +5,11 @@ type PostCreate struct {
 	Content string `json:"content" binding:"required"`
 }
 
+type PostResponse struct {
+	Title   string `json:"title"`
+	Content string `json:"content"`
+}
+
 type Post struct {
 	Title   string
 	Content string

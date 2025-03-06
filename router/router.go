@@ -14,7 +14,9 @@ func Setup(client *ent.Client) *gin.Engine {
 	postRepository := repository.NewPostRepository(client)
 	postService := service.NewPostService(postRepository)
 	postController := controller.NewPostController(postService)
+
 	router.POST("/posts", postController.PostCreate)
+	router.GET("/posts/:postID", postController.Get)
 
 	return router
 }

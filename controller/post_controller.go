@@ -5,10 +5,12 @@ import (
 	"kopherlog/domain"
 	"kopherlog/service"
 	"net/http"
+	"strconv"
 )
 
 type PostController interface {
 	PostCreate(ctx *gin.Context)
+	Get(ctx *gin.Context)
 }
 
 type postController struct {
@@ -43,4 +45,25 @@ func (p *postController) PostCreate(ctx *gin.Context) {
 	}
 	ctx.Status(http.StatusCreated)
 	return
+}
+
+func (p *postController) Get(ctx *gin.Context) {
+	postID, err := strconv.Atoi(ctx.Param("postID"))
+	if err != nil {
+		errorResponse := &domain.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}
+		ctx.JSON(errorResponse.Code, errorResponse)
+	}
+	result, err := p.postService.Get(ctx, postID)
+	if err != nil {
+		errorResponse := &domain.ErrorResponse{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+		ctx.JSON(errorResponse.Code, errorResponse)
+	}
+	// Response 용 Struct 가 필요
+	ctx.JSON(http.StatusOK, gin.H{"data": result})
 }
