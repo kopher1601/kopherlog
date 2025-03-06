@@ -1,16 +1,15 @@
 package config
 
 import (
-	"entgo.io/ent/dialect/sql"
+	"context"
 	"fmt"
 	"kopherlog/ent"
-	"kopherlog/ent/enttest"
+	"kopherlog/ent/migrate"
 	"log"
 	"os"
-	"testing"
 )
 
-func SetupDB(t *testing.T) *ent.Client {
+func SetupDB() *ent.Client {
 	env := os.Getenv("ENV")
 	driver := os.Getenv("DB_DRIVER")
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True",
@@ -20,20 +19,26 @@ func SetupDB(t *testing.T) *ent.Client {
 		os.Getenv("DB_PORT"),
 		os.Getenv("DB_NAME"),
 	)
-	db, err := sql.Open(driver, dsn)
+	client, err := ent.Open(driver, dsn)
 	if err != nil {
 		log.Fatal("Fail connect DB", err)
 	}
+	ctx := context.Background()
 
-	drv := sql.OpenDB(os.Getenv("DB_DRIVER"), db.DB())
 	if env == "test" {
-		options := []enttest.Option{
-			enttest.WithOptions(ent.Driver(drv)),
+		log.Println("Running migration...")
+		err = client.Schema.Create(
+			ctx,
+			migrate.WithDropIndex(true),
+			migrate.WithDropColumn(true),
+		)
+		if err != nil {
+			log.Fatalf("failed creating schema resources: %v", err)
 		}
-		return enttest.NewClient(t, options...)
+		return client
 	}
-	options := []ent.Option{
-		ent.Driver(drv),
+	if err := client.Schema.Create(ctx); err != nil {
+		log.Fatalf("failed creating schema resources: %v", err)
 	}
-	return ent.NewClient(options...)
+	return client
 }

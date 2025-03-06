@@ -3,24 +3,33 @@ package service
 import (
 	"context"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
 	"kopherlog/config"
 	"kopherlog/domain"
+	"kopherlog/ent"
 	"kopherlog/repository"
+	"log"
 	"os"
 	"testing"
 )
 
+var client *ent.Client
+
 func TestMain(m *testing.M) {
-	config.Initialize()
+	err := godotenv.Load("../.env")
+	if err != nil {
+		log.Fatal("Error loading .env file", err)
+	}
+	client = config.SetupDB()
 	code := m.Run()
+	client.Close()
 	os.Exit(code)
 }
 
 func TestPostService_Write(t *testing.T) {
-	client := config.SetupDB(t)
+	// given
 	ctx := context.Background()
-
 	postRepository := repository.NewPostRepository(client)
 	postService := NewPostService(postRepository)
 	postCreate := &domain.PostCreate{
@@ -31,7 +40,10 @@ func TestPostService_Write(t *testing.T) {
 		postRepository.DeleteAll(ctx)
 	})
 
+	// when
 	err := postService.Write(ctx, postCreate)
+
+	// then
 	assert.NoError(t, err)
 	posts, _ := postRepository.FindAll()
 	assert.Equal(t, 1, len(posts))
@@ -41,7 +53,6 @@ func TestPostService_Write(t *testing.T) {
 func TestPostService_Get(t *testing.T) {
 	// given
 	ctx := context.Background()
-	client := config.SetupDB(t)
 	postRepository := repository.NewPostRepository(client)
 	postService := NewPostService(postRepository)
 	postCreate := &domain.PostCreate{

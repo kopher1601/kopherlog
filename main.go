@@ -8,7 +8,7 @@ import (
 
 func main() {
 	config.Initialize()
-	client := config.SetupDB(nil)
+	client := config.SetupDB()
 	r := router.Setup(client)
 
 	r.Run(":8080")

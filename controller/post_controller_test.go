@@ -11,6 +11,7 @@ import (
 	"github.com/stretchr/testify/assert"
 	"kopherlog/config"
 	"kopherlog/domain"
+	"kopherlog/ent"
 	"kopherlog/repository"
 	"kopherlog/service"
 	"log"
@@ -20,35 +21,42 @@ import (
 	"testing"
 )
 
+var client *ent.Client
+
 func TestMain(m *testing.M) {
 	err := godotenv.Load("../.env")
 	if err != nil {
 		log.Fatal("Error loading .env file", err)
 	}
+	client = config.SetupDB()
 	code := m.Run()
+	client.Close()
 	os.Exit(code)
 }
 
 func Test_PostController_Post_Save(t *testing.T) {
+	// given
 	ctx := context.Background()
-	client := config.SetupDB(t)
 	r := gin.Default()
-
 	postCreate := &domain.PostCreate{
 		Title:   "吉祥寺マンション",
 		Content: "吉祥寺マンション購入します。",
 	}
-	var buf bytes.Buffer
-	_ = json.NewEncoder(&buf).Encode(postCreate)
-
-	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
-	req.Header.Set("Content-Type", "application/json")
 	postRepository := repository.NewPostRepository(client)
 	postService := service.NewPostService(postRepository)
 	postController := NewPostController(postService)
+
+	var buf bytes.Buffer
+	_ = json.NewEncoder(&buf).Encode(postCreate)
+	resp := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
+	req.Header.Set("Content-Type", "application/json")
+
+	// when
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
+
+	// then
 	posts, err := postRepository.FindAll()
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.Code)
@@ -60,27 +68,27 @@ func Test_PostController_Post_Save(t *testing.T) {
 }
 
 func Test_PostController_PostCreate_Title_Required(t *testing.T) {
-	client := config.SetupDB(t)
-
+	// given
 	r := gin.Default()
 	postCreate := &domain.PostCreate{
 		Title:   "",
 		Content: "吉祥寺マンション購入します。",
 	}
+	postRepository := repository.NewPostRepository(client)
+	postService := service.NewPostService(postRepository)
+	postController := NewPostController(postService)
+
 	var buf bytes.Buffer
 	_ = json.NewEncoder(&buf).Encode(postCreate)
-
 	resp := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
 	req.Header.Set("Content-Type", "application/json")
 
-	postRepository := repository.NewPostRepository(client)
-	postService := service.NewPostService(postRepository)
-	postController := NewPostController(postService)
+	// when
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
 
-	log.Println(resp.Body.String())
+	// then
 	var errors domain.ErrorResponse
 	_ = json.NewDecoder(resp.Body).Decode(&errors)
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
@@ -89,13 +97,15 @@ func Test_PostController_PostCreate_Title_Required(t *testing.T) {
 }
 
 func Test_PostController_PostCreate_Content_Required(t *testing.T) {
-	client := config.SetupDB(t)
+	// given
 	r := gin.Default()
-
 	postCreate := &domain.PostCreate{
 		Title:   "吉祥寺マンション",
 		Content: "",
 	}
+	postRepository := repository.NewPostRepository(client)
+	postService := service.NewPostService(postRepository)
+	postController := NewPostController(postService)
 	var buf bytes.Buffer
 	_ = json.NewEncoder(&buf).Encode(postCreate)
 
@@ -103,12 +113,11 @@ func Test_PostController_PostCreate_Content_Required(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
 	req.Header.Set("Content-Type", "application/json")
 
-	postRepository := repository.NewPostRepository(client)
-	postService := service.NewPostService(postRepository)
-	postController := NewPostController(postService)
+	// when
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
 
+	// then
 	var errors domain.ErrorResponse
 	_ = json.NewDecoder(resp.Body).Decode(&errors)
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
@@ -117,13 +126,16 @@ func Test_PostController_PostCreate_Content_Required(t *testing.T) {
 }
 
 func Test_PostController_PostCreate_Title_Content_Required(t *testing.T) {
-	client := config.SetupDB(t)
+	// given
 	r := gin.Default()
-
 	postCreate := &domain.PostCreate{
 		Title:   "",
 		Content: "",
 	}
+	postRepository := repository.NewPostRepository(client)
+	postService := service.NewPostService(postRepository)
+	postController := NewPostController(postService)
+
 	var buf bytes.Buffer
 	_ = json.NewEncoder(&buf).Encode(postCreate)
 
@@ -131,13 +143,11 @@ func Test_PostController_PostCreate_Title_Content_Required(t *testing.T) {
 	req, _ := http.NewRequest(http.MethodPost, "/posts", &buf)
 	req.Header.Set("Content-Type", "application/json")
 
-	postRepository := repository.NewPostRepository(client)
-	postService := service.NewPostService(postRepository)
-	postController := NewPostController(postService)
+	// when
 	r.POST("/posts", postController.PostCreate)
 	r.ServeHTTP(resp, req)
 
-	log.Println(resp.Body.String())
+	// then
 	var errors domain.ErrorResponse
 	_ = json.NewDecoder(resp.Body).Decode(&errors)
 	assert.Equal(t, http.StatusBadRequest, resp.Code)
@@ -148,11 +158,12 @@ func Test_PostController_PostCreate_Title_Content_Required(t *testing.T) {
 }
 
 func TestPostController_Get(t *testing.T) {
-	ctx := context.Background()
-	client := config.SetupDB(t)
+	// given
 	r := gin.Default()
-
+	ctx := context.Background()
 	postRepository := repository.NewPostRepository(client)
+	postService := service.NewPostService(postRepository)
+	postController := NewPostController(postService)
 	post := &domain.Post{
 		Title:   "吉祥寺マンション",
 		Content: "吉祥寺マンション購入します。",
@@ -160,15 +171,13 @@ func TestPostController_Get(t *testing.T) {
 	t.Cleanup(func() {
 		postRepository.DeleteAll(ctx)
 	})
-
 	savedPost, _ := postRepository.Save(ctx, post)
 
 	resp := httptest.NewRecorder()
 	req, _ := http.NewRequest(http.MethodPost, fmt.Sprintf("/posts/%d", savedPost.ID), nil)
 	req.Header.Set("Content-Type", "application/json")
 
-	postService := service.NewPostService(postRepository)
-	postController := NewPostController(postService)
+	// when
 	r.POST("/posts/:postID", postController.Get)
 	r.ServeHTTP(resp, req)
 
