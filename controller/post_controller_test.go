@@ -63,7 +63,7 @@ func Test_PostController_Post_Save(t *testing.T) {
 	r.ServeHTTP(resp, req)
 
 	// then
-	posts, err := postRepository.FindAll()
+	posts, err := postRepository.FindAll(ctx, nil)
 	assert.NoError(t, err)
 	assert.Equal(t, http.StatusCreated, resp.Code)
 	assert.Equal(t, 1, len(posts))
@@ -202,7 +202,7 @@ func TestPostController_GetAll(t *testing.T) {
 	postRepository.Save(ctx, post2)
 
 	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/posts", nil)
+	req, _ := http.NewRequest(http.MethodPost, "/posts?page=2&size=10", nil)
 	req.Header.Set("Content-Type", "application/json")
 
 	// when

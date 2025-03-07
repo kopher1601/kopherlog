@@ -2,6 +2,7 @@ package service
 
 import (
 	"context"
+	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
 	"github.com/stretchr/testify/assert"
@@ -45,7 +46,7 @@ func TestPostService_Write(t *testing.T) {
 
 	// then
 	assert.NoError(t, err)
-	posts, _ := postRepository.FindAll()
+	posts, _ := postRepository.FindAll(ctx, nil)
 	assert.Equal(t, 1, len(posts))
 	assert.Equal(t, "吉祥寺マンション", posts[0].Title)
 }
@@ -55,12 +56,17 @@ func TestPostService_Get(t *testing.T) {
 	ctx := context.Background()
 	postRepository := repository.NewPostRepository(client)
 	postService := NewPostService(postRepository)
-	postCreate := &domain.PostCreate{
-		Title:   "吉祥寺マンション",
-		Content: "吉祥寺マンション購入します。",
+
+	var postCreates []*domain.PostCreate
+	for i := 0; i < 30; i++ {
+		postCreates = append(postCreates, &domain.PostCreate{
+			Title:   fmt.Sprintf("吉祥寺マンション %d", i),
+			Content: fmt.Sprintf("吉祥寺マンション購入します。 %d", i),
+		})
 	}
-	postService.Write(ctx, postCreate)
-	posts, _ := postRepository.FindAll()
+	postRepository.SaveAll(ctx, postCreates)
+
+	posts, _ := postRepository.FindAll(ctx, nil)
 	t.Cleanup(func() {
 		postRepository.DeleteAll(ctx)
 	})
@@ -72,4 +78,35 @@ func TestPostService_Get(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, "吉祥寺マンション", foundPost.Title)
 	assert.Equal(t, "吉祥寺マンション購入します。", foundPost.Content)
+}
+
+func TestPostService_GetAll_FirstPage(t *testing.T) {
+	// given
+	ctx := context.Background()
+	postRepository := repository.NewPostRepository(client)
+	postService := NewPostService(postRepository)
+	t.Cleanup(func() {
+		postRepository.DeleteAll(ctx)
+	})
+
+	var postCreates []*domain.PostCreate
+	for i := 0; i < 30; i++ {
+		postCreates = append(postCreates, &domain.PostCreate{
+			Title:   fmt.Sprintf("吉祥寺マンション %d", i),
+			Content: fmt.Sprintf("吉祥寺マンション購入します。 %d", i),
+		})
+	}
+	err := postRepository.SaveAll(ctx, postCreates)
+
+	// then
+	search := &domain.PostSearch{
+		Page: 2,
+		Size: 10,
+	}
+	posts, _ := postService.GetAll(ctx, search)
+
+	// then
+	assert.NoError(t, err)
+	assert.Equal(t, "吉祥寺マンション 19", posts[0].Title)
+	assert.Equal(t, "吉祥寺マンション購入します。 19", posts[0].Content)
 }

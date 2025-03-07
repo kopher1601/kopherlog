@@ -11,9 +11,10 @@ import (
 
 type PostRepository interface {
 	Save(ctx context.Context, post *domain.Post) (*domain.Post, error)
-	FindAll() ([]*ent.Post, error)
+	FindAll(ctx context.Context, search *domain.PostSearch) ([]*ent.Post, error)
 	DeleteAll(ctx context.Context) error
 	FindByID(ctx context.Context, id int) (*ent.Post, error)
+	SaveAll(ctx context.Context, creates []*domain.PostCreate) error
 }
 
 type postRepository struct {
@@ -52,8 +53,11 @@ func (p *postRepository) Save(ctx context.Context, post *domain.Post) (*domain.P
 	return &response, nil
 }
 
-func (p *postRepository) FindAll() ([]*ent.Post, error) {
-	posts, err := p.ent.Post.Query().All(context.Background())
+func (p *postRepository) FindAll(ctx context.Context, search *domain.PostSearch) ([]*ent.Post, error) {
+	posts, err := p.ent.Post.Query().
+		Offset(search.Offset()).
+		Limit(search.Limit()).
+		Order(ent.Desc(post.FieldID)).All(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -67,4 +71,16 @@ func (p *postRepository) FindByID(ctx context.Context, id int) (*ent.Post, error
 		return nil, err
 	}
 	return foundPost, nil
+}
+
+func (p *postRepository) SaveAll(ctx context.Context, posts []*domain.PostCreate) error {
+	return db.WithTx(ctx, p.ent, func(tx *ent.Tx) error {
+		_, err := tx.Post.MapCreateBulk(posts, func(postCreate *ent.PostCreate, i int) {
+			postCreate.SetTitle(posts[i].Title).SetContent(posts[i].Content)
+		}).Save(ctx)
+		if err != nil {
+			return err
+		}
+		return nil
+	})
 }

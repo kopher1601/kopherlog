@@ -71,7 +71,7 @@ func (p *postController) Get(ctx *gin.Context) {
 }
 
 func (p *postController) GetAll(ctx *gin.Context) {
-	posts, err := p.postService.GetAll()
+	posts, err := p.postService.GetAll(ctx, nil)
 	if err != nil {
 		errorResponse := &domain.ErrorResponse{
 			Code:    http.StatusInternalServerError,
