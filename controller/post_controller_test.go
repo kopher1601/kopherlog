@@ -12,6 +12,7 @@ import (
 	"kopherlog/config"
 	"kopherlog/domain"
 	"kopherlog/ent"
+	"kopherlog/middleware"
 	"kopherlog/repository"
 	"kopherlog/service"
 	"log"
@@ -204,6 +205,7 @@ func TestPostController_GetAll(t *testing.T) {
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	// when
+	r.Use(middleware.ValidateQueryParams())
 	r.GET("/posts", tPostController.GetAll)
 	r.ServeHTTP(resp, req)
 

@@ -71,33 +71,19 @@ func (p *postController) Get(ctx *gin.Context) {
 }
 
 func (p *postController) GetAll(ctx *gin.Context) {
-	var paramErrors []*domain.ValidationError
-	page, err := strconv.Atoi(ctx.Query("page"))
-	if err != nil {
-		paramErrors = append(paramErrors, &domain.ValidationError{
-			Field:   "page",
-			Message: err.Error(),
-		})
-	}
-	size, err := strconv.Atoi(ctx.Query("size"))
-	if err != nil {
-		paramErrors = append(paramErrors, &domain.ValidationError{
-			Field:   "size",
-			Message: err.Error(),
-		})
-	}
-	if len(paramErrors) > 0 {
+	params, exists := ctx.Get("queryParams")
+	if !exists {
 		errorResponse := &domain.ErrorResponse{
-			Code:        http.StatusBadRequest,
-			Message:     err.Error(),
-			Validations: paramErrors,
+			Code: http.StatusBadRequest,
 		}
 		ctx.JSON(errorResponse.Code, errorResponse)
+		return
 	}
+	searchParams := params.(domain.PostSearchParams)
 
 	search := &domain.PostSearch{
-		Page: page,
-		Size: size,
+		Page: searchParams.Page,
+		Size: searchParams.Size,
 	}
 	posts, err := p.postService.GetAll(ctx, search)
 	if err != nil {

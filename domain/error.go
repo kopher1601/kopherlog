@@ -18,6 +18,7 @@ type ValidationError struct {
 
 var customMessages = map[string]string{
 	"required": "必須です。",
+	"lte":      "サイズが大きいすげです。",
 }
 
 func (e *ErrorResponse) AddValidationErrors(error error) {
@@ -25,8 +26,7 @@ func (e *ErrorResponse) AddValidationErrors(error error) {
 	var validationErrors validator.ValidationErrors
 	if errors.As(error, &validationErrors) {
 		for _, e := range validationErrors {
-			var msg string
-
+			msg := e.Error()
 			// カスタムメッセージがあれば交換
 			if customMsg, exists := customMessages[e.Tag()]; exists {
 				msg = customMsg

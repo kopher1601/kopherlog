@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"kopherlog/controller"
 	"kopherlog/ent"
+	"kopherlog/middleware"
 	"kopherlog/repository"
 	"kopherlog/service"
 )
@@ -17,7 +18,7 @@ func Setup(client *ent.Client) *gin.Engine {
 
 	router.POST("/posts", postController.PostCreate)
 	router.GET("/posts/:postID", postController.Get)
-	router.GET("/posts", postController.GetAll)
+	router.GET("/posts", middleware.ValidateQueryParams(), postController.GetAll)
 
 	return router
 }
