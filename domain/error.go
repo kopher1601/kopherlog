@@ -1,13 +1,14 @@
 package domain
 
 import (
+	"errors"
 	"github.com/go-playground/validator/v10"
 )
 
 type ErrorResponse struct {
-	Code        int               `json:"code"`
-	Message     string            `json:"message"`
-	Validations []ValidationError `json:"validations"`
+	Code        int                `json:"code"`
+	Message     string             `json:"message"`
+	Validations []*ValidationError `json:"validations"`
 }
 
 type ValidationError struct {
@@ -20,8 +21,9 @@ var customMessages = map[string]string{
 }
 
 func (e *ErrorResponse) AddValidationErrors(error error) {
-	var validations []ValidationError
-	if validationErrors, ok := error.(validator.ValidationErrors); ok {
+	var validations []*ValidationError
+	var validationErrors validator.ValidationErrors
+	if errors.As(error, &validationErrors) {
 		for _, e := range validationErrors {
 			var msg string
 
@@ -30,7 +32,7 @@ func (e *ErrorResponse) AddValidationErrors(error error) {
 				msg = customMsg
 			}
 
-			validations = append(validations, ValidationError{
+			validations = append(validations, &ValidationError{
 				Field:   e.Field(),
 				Message: msg,
 			})

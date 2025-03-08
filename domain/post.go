@@ -13,6 +13,11 @@ type PostResponse struct {
 	Content string `json:"content"`
 }
 
+type PostSearchParams struct {
+	Page int `form:"page" validate:"required,numeric,gte=0"`
+	Size int `form:"size" validate:"required,numeric,gte=0,lte=100"`
+}
+
 type PostSearch struct {
 	Page int
 	Size int

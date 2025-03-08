@@ -54,10 +54,17 @@ func (p *postRepository) Save(ctx context.Context, post *domain.Post) (*domain.P
 }
 
 func (p *postRepository) FindAll(ctx context.Context, search *domain.PostSearch) ([]*ent.Post, error) {
+	if search == nil {
+		search = &domain.PostSearch{
+			Page: 0,
+			Size: 10,
+		}
+	}
 	posts, err := p.ent.Post.Query().
 		Offset(search.Offset()).
 		Limit(search.Limit()).
-		Order(ent.Desc(post.FieldID)).All(ctx)
+		Order(ent.Desc(post.FieldID)).
+		All(ctx)
 	if err != nil {
 		return nil, err
 	}

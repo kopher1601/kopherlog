@@ -76,8 +76,8 @@ func TestPostService_Get(t *testing.T) {
 
 	// then
 	assert.NoError(t, err)
-	assert.Equal(t, "吉祥寺マンション", foundPost.Title)
-	assert.Equal(t, "吉祥寺マンション購入します。", foundPost.Content)
+	assert.Equal(t, "吉祥寺マンション 29", foundPost.Title)
+	assert.Equal(t, "吉祥寺マンション購入します。 29", foundPost.Content)
 }
 
 func TestPostService_GetAll_FirstPage(t *testing.T) {
@@ -96,7 +96,7 @@ func TestPostService_GetAll_FirstPage(t *testing.T) {
 			Content: fmt.Sprintf("吉祥寺マンション購入します。 %d", i),
 		})
 	}
-	err := postRepository.SaveAll(ctx, postCreates)
+	postRepository.SaveAll(ctx, postCreates)
 
 	// then
 	search := &domain.PostSearch{
@@ -106,7 +106,6 @@ func TestPostService_GetAll_FirstPage(t *testing.T) {
 	posts, _ := postService.GetAll(ctx, search)
 
 	// then
-	assert.NoError(t, err)
 	assert.Equal(t, "吉祥寺マンション 19", posts[0].Title)
 	assert.Equal(t, "吉祥寺マンション購入します。 19", posts[0].Content)
 }

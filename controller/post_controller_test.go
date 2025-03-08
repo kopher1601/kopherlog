@@ -190,31 +190,30 @@ func TestPostController_GetAll(t *testing.T) {
 	t.Cleanup(func() {
 		postRepository.DeleteAll(ctx)
 	})
-	post1 := &domain.Post{
-		Title:   "吉祥寺マンション",
-		Content: "吉祥寺マンション購入します。",
+	var postCreates []*domain.PostCreate
+	for i := 0; i < 30; i++ {
+		postCreates = append(postCreates, &domain.PostCreate{
+			Title:   fmt.Sprintf("吉祥寺マンション %d", i),
+			Content: fmt.Sprintf("吉祥寺マンション購入します。 %d", i),
+		})
 	}
-	postRepository.Save(ctx, post1)
-	post2 := &domain.Post{
-		Title:   "高円寺マンション",
-		Content: "高円寺マンション購入します。",
-	}
-	postRepository.Save(ctx, post2)
+	postRepository.SaveAll(ctx, postCreates)
 
 	resp := httptest.NewRecorder()
-	req, _ := http.NewRequest(http.MethodPost, "/posts?page=2&size=10", nil)
-	req.Header.Set("Content-Type", "application/json")
+	req, _ := http.NewRequest(http.MethodGet, "/posts?page=1&size=10", nil)
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
 
 	// when
-	r.POST("/posts", tPostController.GetAll)
+	r.GET("/posts", tPostController.GetAll)
 	r.ServeHTTP(resp, req)
 
 	// then
+	log.Println(resp)
 	var postResponse []*domain.PostResponse
 	_ = json.NewDecoder(resp.Body).Decode(&postResponse)
 	assert.Equal(t, http.StatusOK, resp.Code)
-	assert.Equal(t, "吉祥寺マンション", postResponse[0].Title)
-	assert.Equal(t, "吉祥寺マンション購入します。", postResponse[0].Content)
-	assert.Equal(t, "高円寺マンション", postResponse[1].Title)
-	assert.Equal(t, "高円寺マンション購入します。", postResponse[1].Content)
+	assert.Equal(t, "吉祥寺マンション 29", postResponse[0].Title)
+	assert.Equal(t, "吉祥寺マンション購入します。 29", postResponse[0].Content)
+	assert.Equal(t, "吉祥寺マンション 28", postResponse[1].Title)
+	assert.Equal(t, "吉祥寺マンション購入します。 28", postResponse[1].Content)
 }

@@ -71,7 +71,35 @@ func (p *postController) Get(ctx *gin.Context) {
 }
 
 func (p *postController) GetAll(ctx *gin.Context) {
-	posts, err := p.postService.GetAll(ctx, nil)
+	var paramErrors []*domain.ValidationError
+	page, err := strconv.Atoi(ctx.Query("page"))
+	if err != nil {
+		paramErrors = append(paramErrors, &domain.ValidationError{
+			Field:   "page",
+			Message: err.Error(),
+		})
+	}
+	size, err := strconv.Atoi(ctx.Query("size"))
+	if err != nil {
+		paramErrors = append(paramErrors, &domain.ValidationError{
+			Field:   "size",
+			Message: err.Error(),
+		})
+	}
+	if len(paramErrors) > 0 {
+		errorResponse := &domain.ErrorResponse{
+			Code:        http.StatusBadRequest,
+			Message:     err.Error(),
+			Validations: paramErrors,
+		}
+		ctx.JSON(errorResponse.Code, errorResponse)
+	}
+
+	search := &domain.PostSearch{
+		Page: page,
+		Size: size,
+	}
+	posts, err := p.postService.GetAll(ctx, search)
 	if err != nil {
 		errorResponse := &domain.ErrorResponse{
 			Code:    http.StatusInternalServerError,
