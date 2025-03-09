@@ -11,6 +11,7 @@ type PostService interface {
 	Get(ctx context.Context, id int) (*domain.PostResponse, error)
 	GetAll(ctx context.Context, search *domain.PostSearch) ([]*domain.PostResponse, error)
 	Edit(ctx context.Context, id int, edit *domain.PostEdit) error
+	Delete(ctx context.Context, id int) error
 }
 
 type postService struct {
@@ -82,4 +83,16 @@ func coalesce(values ...string) string {
 		}
 	}
 	return ""
+}
+
+func (p *postService) Delete(ctx context.Context, id int) error {
+	_, err := p.postRepository.FindByID(ctx, id)
+	if err != nil {
+		return err
+	}
+	err = p.postRepository.Delete(ctx, id)
+	if err != nil {
+		return err
+	}
+	return nil
 }

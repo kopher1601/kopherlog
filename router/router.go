@@ -18,6 +18,7 @@ func Setup(client *ent.Client) *gin.Engine {
 
 	router.GET("/posts/:postID", postController.Get)
 	router.PUT("/posts/:postID", postController.Edit)
+	router.DELETE("/posts/:postID", postController.Delete)
 	router.POST("/posts", postController.PostCreate)
 	router.GET("/posts", middleware.ValidateQueryParams(), postController.GetAll)
 

@@ -136,3 +136,26 @@ func TestPostService_Edit(t *testing.T) {
 	assert.Equal(t, "高円寺マンション", foundPost.Title)
 	assert.Equal(t, "高円寺マンション購入します", foundPost.Content)
 }
+
+func TestPostService_Delete(t *testing.T) {
+	// given
+	ctx := context.Background()
+	postRepository := repository.NewPostRepository(client)
+	postService := NewPostService(postRepository)
+	t.Cleanup(func() {
+		postRepository.DeleteAll(ctx)
+	})
+	postCreate := &domain.Post{
+		Title:   "吉祥寺マンション",
+		Content: "吉祥寺マンション購入します。",
+	}
+	savedPost, _ := postRepository.Save(ctx, postCreate)
+
+	// then
+	postService.Delete(ctx, savedPost.ID)
+
+	// then
+	results, err := postRepository.FindAll(ctx, nil)
+	log.Println(err)
+	assert.Equal(t, 0, len(results))
+}

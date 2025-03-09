@@ -12,6 +12,7 @@ import (
 type PostRepository interface {
 	Save(ctx context.Context, post *domain.Post) (*domain.Post, error)
 	FindAll(ctx context.Context, search *domain.PostSearch) ([]*ent.Post, error)
+	Delete(ctx context.Context, id int) error
 	DeleteAll(ctx context.Context) error
 	FindByID(ctx context.Context, id int) (*ent.Post, error)
 	SaveAll(ctx context.Context, creates []*domain.PostCreate) error
@@ -20,14 +21,6 @@ type PostRepository interface {
 
 type postRepository struct {
 	ent *ent.Client
-}
-
-func (p *postRepository) DeleteAll(ctx context.Context) error {
-	_, err := p.ent.Post.Delete().Exec(ctx)
-	if err != nil {
-		return err
-	}
-	return nil
 }
 
 func NewPostRepository(ent *ent.Client) PostRepository {
@@ -100,6 +93,23 @@ func (p *postRepository) Update(ctx context.Context, target *ent.Post, source *d
 		Save(ctx)
 	if err != nil {
 		log.Println("postRepository.Update:", err)
+		return err
+	}
+	return nil
+}
+
+func (p *postRepository) Delete(ctx context.Context, id int) error {
+	_, err := p.ent.Post.Delete().Where(post.ID(id)).Exec(ctx)
+	if err != nil {
+		log.Println("postRepository.Delete:", err)
+		return err
+	}
+	return nil
+}
+
+func (p *postRepository) DeleteAll(ctx context.Context) error {
+	_, err := p.ent.Post.Delete().Exec(ctx)
+	if err != nil {
 		return err
 	}
 	return nil

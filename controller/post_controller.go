@@ -13,6 +13,7 @@ type PostController interface {
 	Get(ctx *gin.Context)
 	GetAll(ctx *gin.Context)
 	Edit(ctx *gin.Context)
+	Delete(ctx *gin.Context)
 }
 
 type postController struct {
@@ -130,4 +131,27 @@ func (p *postController) Edit(ctx *gin.Context) {
 		ctx.JSON(errorResponse.Code, errorResponse)
 		return
 	}
+}
+
+func (p *postController) Delete(ctx *gin.Context) {
+	postID, err := strconv.Atoi(ctx.Param("postID"))
+	if err != nil {
+		errorResponse := &domain.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}
+		ctx.JSON(errorResponse.Code, errorResponse)
+		return
+	}
+
+	err = p.postService.Delete(ctx, postID)
+	if err != nil {
+		errorResponse := &domain.ErrorResponse{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+		ctx.JSON(errorResponse.Code, errorResponse)
+		return
+	}
+	ctx.Status(http.StatusNoContent)
 }

@@ -295,3 +295,28 @@ func TestPostController_Edit_Partial(t *testing.T) {
 	assert.Equal(t, "立川のマンションを購入する。", foundPost.Title)
 	assert.Equal(t, "武蔵境のマンションを購入しました。", foundPost.Content)
 }
+
+func TestPostController_Delete(t *testing.T) {
+	// given
+	r := gin.Default()
+	ctx := context.Background()
+	post := &domain.Post{
+		Title:   "吉祥寺マンション",
+		Content: "吉祥寺マンション購入します。",
+	}
+	t.Cleanup(func() {
+		postRepository.DeleteAll(ctx)
+	})
+	savedPost, _ := postRepository.Save(ctx, post)
+
+	resp := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodDelete, fmt.Sprintf("/posts/%d", savedPost.ID), nil)
+	req.Header.Set("Content-Type", "application/json")
+
+	// when
+	r.DELETE("/posts/:postID", tPostController.Delete)
+	r.ServeHTTP(resp, req)
+
+	// then
+	assert.Equal(t, http.StatusNoContent, resp.Code)
+}
