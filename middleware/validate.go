@@ -24,7 +24,7 @@ func ValidateQueryParams() gin.HandlerFunc {
 		}
 
 		sizeStr := c.Query("size")
-		if !isNumeric(pageStr) {
+		if !isNumeric(sizeStr) {
 			paramErrors = append(paramErrors, &domain.ValidationError{
 				Field:   "size",
 				Message: "size must be positive numbers",

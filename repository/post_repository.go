@@ -15,6 +15,7 @@ type PostRepository interface {
 	DeleteAll(ctx context.Context) error
 	FindByID(ctx context.Context, id int) (*ent.Post, error)
 	SaveAll(ctx context.Context, creates []*domain.PostCreate) error
+	Update(ctx context.Context, target *ent.Post, source *domain.Post) error
 }
 
 type postRepository struct {
@@ -90,4 +91,16 @@ func (p *postRepository) SaveAll(ctx context.Context, posts []*domain.PostCreate
 		}
 		return nil
 	})
+}
+
+func (p *postRepository) Update(ctx context.Context, target *ent.Post, source *domain.Post) error {
+	_, err := p.ent.Post.UpdateOne(target).
+		SetTitle(source.Title).
+		SetContent(source.Content).
+		Save(ctx)
+	if err != nil {
+		log.Println("postRepository.Update:", err)
+		return err
+	}
+	return nil
 }

@@ -219,3 +219,79 @@ func TestPostController_GetAll(t *testing.T) {
 	assert.Equal(t, "吉祥寺マンション 28", postResponse[1].Title)
 	assert.Equal(t, "吉祥寺マンション購入します。 28", postResponse[1].Content)
 }
+
+func TestPostController_Edit(t *testing.T) {
+	// given
+	r := gin.Default()
+	ctx := context.Background()
+	t.Cleanup(func() {
+		postRepository.DeleteAll(ctx)
+	})
+	post := &domain.Post{
+		Title:   "武蔵境のマンションを購入する。",
+		Content: "武蔵境のマンションを購入しました。",
+	}
+	savedPost, _ := postRepository.Save(ctx, post)
+
+	postCreate := &domain.PostCreate{
+		Title:   "立川のマンションを購入する。",
+		Content: "立川のマンションを購入しました。",
+	}
+	var buf bytes.Buffer
+	json.NewEncoder(&buf).Encode(postCreate)
+
+	resp := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, fmt.Sprintf("/posts/%d", savedPost.ID), &buf)
+	req.Header.Set("Content-Type", "application/json")
+
+	// when
+	r.PUT("/posts/:postID", tPostController.Edit)
+	r.ServeHTTP(resp, req)
+
+	// then
+	log.Println(resp)
+	foundPost, _ := postRepository.FindByID(ctx, savedPost.ID)
+	var postResponse *domain.PostResponse
+	_ = json.NewDecoder(resp.Body).Decode(&postResponse)
+	assert.Equal(t, http.StatusOK, resp.Code)
+	assert.Equal(t, "立川のマンションを購入する。", foundPost.Title)
+	assert.Equal(t, "立川のマンションを購入しました。", foundPost.Content)
+}
+
+func TestPostController_Edit_Partial(t *testing.T) {
+	// given
+	r := gin.Default()
+	ctx := context.Background()
+	t.Cleanup(func() {
+		postRepository.DeleteAll(ctx)
+	})
+	post := &domain.Post{
+		Title:   "武蔵境のマンションを購入する。",
+		Content: "武蔵境のマンションを購入しました。",
+	}
+	savedPost, _ := postRepository.Save(ctx, post)
+
+	postCreate := &domain.PostCreate{
+		Title:   "立川のマンションを購入する。",
+		Content: "武蔵境のマンションを購入しました。",
+	}
+	var buf bytes.Buffer
+	json.NewEncoder(&buf).Encode(postCreate)
+
+	resp := httptest.NewRecorder()
+	req, _ := http.NewRequest(http.MethodPut, fmt.Sprintf("/posts/%d", savedPost.ID), &buf)
+	req.Header.Set("Content-Type", "application/json")
+
+	// when
+	r.PUT("/posts/:postID", tPostController.Edit)
+	r.ServeHTTP(resp, req)
+
+	// then
+	log.Println(resp)
+	foundPost, _ := postRepository.FindByID(ctx, savedPost.ID)
+	var postResponse *domain.PostResponse
+	_ = json.NewDecoder(resp.Body).Decode(&postResponse)
+	assert.Equal(t, http.StatusOK, resp.Code)
+	assert.Equal(t, "立川のマンションを購入する。", foundPost.Title)
+	assert.Equal(t, "武蔵境のマンションを購入しました。", foundPost.Content)
+}

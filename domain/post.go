@@ -14,8 +14,19 @@ type PostResponse struct {
 }
 
 type PostSearchParams struct {
-	Page int `form:"page" validate:"required,numeric,gte=0"`
-	Size int `form:"size" validate:"required,numeric,gte=0,lte=100"`
+	Page int `form:"page" binding:"required,numeric,gte=0"`
+	Size int `form:"size" binding:"required,numeric,gte=0,lte=100"`
+}
+
+type PostEdit struct {
+	Title   string `json:"title" binding:"min=1"`
+	Content string `json:"content" binding:"min=1"`
+}
+
+type Post struct {
+	ID      int
+	Title   string
+	Content string
 }
 
 type PostSearch struct {
@@ -30,10 +41,4 @@ func (p *PostSearch) Offset() int {
 func (p *PostSearch) Limit() int {
 	const maxSize = 100
 	return int(math.Min(maxSize, float64(p.Size)))
-}
-
-type Post struct {
-	ID      int
-	Title   string
-	Content string
 }

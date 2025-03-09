@@ -12,6 +12,7 @@ type PostController interface {
 	PostCreate(ctx *gin.Context)
 	Get(ctx *gin.Context)
 	GetAll(ctx *gin.Context)
+	Edit(ctx *gin.Context)
 }
 
 type postController struct {
@@ -95,4 +96,38 @@ func (p *postController) GetAll(ctx *gin.Context) {
 		return
 	}
 	ctx.JSON(http.StatusOK, posts)
+}
+
+func (p *postController) Edit(ctx *gin.Context) {
+	postID, err := strconv.Atoi(ctx.Param("postID"))
+	if err != nil {
+		errorResponse := &domain.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}
+		ctx.JSON(errorResponse.Code, errorResponse)
+		return
+	}
+
+	var postEdit domain.PostEdit
+	err = ctx.ShouldBindJSON(&postEdit)
+	if err != nil {
+		errorResponse := &domain.ErrorResponse{
+			Code:    http.StatusBadRequest,
+			Message: err.Error(),
+		}
+		errorResponse.AddValidationErrors(err)
+		ctx.JSON(errorResponse.Code, errorResponse)
+		return
+	}
+
+	err = p.postService.Edit(ctx, postID, &postEdit)
+	if err != nil {
+		errorResponse := &domain.ErrorResponse{
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		}
+		ctx.JSON(errorResponse.Code, errorResponse)
+		return
+	}
 }

@@ -109,3 +109,30 @@ func TestPostService_GetAll_FirstPage(t *testing.T) {
 	assert.Equal(t, "吉祥寺マンション 19", posts[0].Title)
 	assert.Equal(t, "吉祥寺マンション購入します。 19", posts[0].Content)
 }
+
+func TestPostService_Edit(t *testing.T) {
+	// given
+	ctx := context.Background()
+	postRepository := repository.NewPostRepository(client)
+	postService := NewPostService(postRepository)
+	t.Cleanup(func() {
+		postRepository.DeleteAll(ctx)
+	})
+	postCreate := &domain.Post{
+		Title:   "吉祥寺マンション",
+		Content: "吉祥寺マンション購入します。",
+	}
+	savedPost, _ := postRepository.Save(ctx, postCreate)
+
+	// then
+	edit := &domain.PostEdit{
+		Title:   "高円寺マンション",
+		Content: "高円寺マンション購入します",
+	}
+	postService.Edit(ctx, savedPost.ID, edit)
+
+	// then
+	foundPost, _ := postRepository.FindByID(ctx, savedPost.ID)
+	assert.Equal(t, "高円寺マンション", foundPost.Title)
+	assert.Equal(t, "高円寺マンション購入します", foundPost.Content)
+}

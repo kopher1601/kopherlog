@@ -10,6 +10,7 @@ type PostService interface {
 	Write(ctx context.Context, postCreate *domain.PostCreate) error
 	Get(ctx context.Context, id int) (*domain.PostResponse, error)
 	GetAll(ctx context.Context, search *domain.PostSearch) ([]*domain.PostResponse, error)
+	Edit(ctx context.Context, id int, edit *domain.PostEdit) error
 }
 
 type postService struct {
@@ -55,4 +56,30 @@ func (p *postService) GetAll(ctx context.Context, search *domain.PostSearch) ([]
 		})
 	}
 	return postResponses, nil
+}
+
+func (p *postService) Edit(ctx context.Context, id int, edit *domain.PostEdit) error {
+	target, err := p.postRepository.FindByID(ctx, id)
+	if err != nil {
+		return err
+	}
+
+	post := &domain.Post{
+		Title:   coalesce(edit.Title, target.Title),
+		Content: coalesce(edit.Content, target.Content),
+	}
+	err = p.postRepository.Update(ctx, target, post)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func coalesce(values ...string) string {
+	for _, value := range values {
+		if value != "" {
+			return value
+		}
+	}
+	return ""
 }
