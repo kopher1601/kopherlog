@@ -22,5 +22,9 @@ func Setup(client *ent.Client) *gin.Engine {
 	router.POST("/posts", postController.PostCreate)
 	router.GET("/posts", middleware.ValidateQueryParams(), postController.GetAll)
 
+	authController := controller.NewAuthController()
+
+	router.POST("/auth/login", authController.Login)
+
 	return router
 }
