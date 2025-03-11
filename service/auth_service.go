@@ -23,5 +23,6 @@ func (a authService) SignIn(ctx context.Context, signin *domain.SignIn) (string,
 	if err != nil {
 		return "", err
 	}
+
 	return foundUser.Email, nil
 }

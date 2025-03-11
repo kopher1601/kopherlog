@@ -20,6 +20,17 @@ var (
 		Columns:    PostsColumns,
 		PrimaryKey: []*schema.Column{PostsColumns[0]},
 	}
+	// SessionsColumns holds the columns for the "sessions" table.
+	SessionsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "access_token", Type: field.TypeString},
+	}
+	// SessionsTable holds the schema information for the "sessions" table.
+	SessionsTable = &schema.Table{
+		Name:       "sessions",
+		Columns:    SessionsColumns,
+		PrimaryKey: []*schema.Column{SessionsColumns[0]},
+	}
 	// UsersColumns holds the columns for the "users" table.
 	UsersColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -34,12 +45,41 @@ var (
 		Columns:    UsersColumns,
 		PrimaryKey: []*schema.Column{UsersColumns[0]},
 	}
+	// SessionUsersColumns holds the columns for the "session_users" table.
+	SessionUsersColumns = []*schema.Column{
+		{Name: "session_id", Type: field.TypeInt},
+		{Name: "user_id", Type: field.TypeInt},
+	}
+	// SessionUsersTable holds the schema information for the "session_users" table.
+	SessionUsersTable = &schema.Table{
+		Name:       "session_users",
+		Columns:    SessionUsersColumns,
+		PrimaryKey: []*schema.Column{SessionUsersColumns[0], SessionUsersColumns[1]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:     "session_users_session_id",
+				Columns:    []*schema.Column{SessionUsersColumns[0]},
+				RefColumns: []*schema.Column{SessionsColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+			{
+				Symbol:     "session_users_user_id",
+				Columns:    []*schema.Column{SessionUsersColumns[1]},
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.Cascade,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		PostsTable,
+		SessionsTable,
 		UsersTable,
+		SessionUsersTable,
 	}
 )
 
 func init() {
+	SessionUsersTable.ForeignKeys[0].RefTable = SessionsTable
+	SessionUsersTable.ForeignKeys[1].RefTable = UsersTable
 }
