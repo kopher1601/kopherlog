@@ -24,7 +24,6 @@ func (u userRepository) FindByEmailAndPassword(ctx context.Context, signin *doma
 	if err != nil {
 		return nil, err
 	}
-	u.ent.Session.Create().AddUsers(foundUser).Save(ctx)
 	return &domain.User{
 		ID:        foundUser.ID,
 		Name:      foundUser.Name,
