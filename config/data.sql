@@ -1,1 +1,0 @@
-insert into users(name, email, password, created_at) values ('kopherlog', 'kopherlog@gmail.com', '1234', '2025-03-09 21:30');

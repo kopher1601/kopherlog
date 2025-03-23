@@ -1,8 +1,0 @@
-### Login
-POST http://localhost:8080/auth/login
-Content-Type: application/json
-
-{
-  "email": "kopherlog@gmail.com",
-  "password": "1234"
-}
