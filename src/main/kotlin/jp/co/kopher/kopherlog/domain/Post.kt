@@ -5,12 +5,21 @@ import jakarta.persistence.*
 @Entity
 class Post(
 
-    private var title: String,
+    private val _title: String,
 
     @Lob
-    private var content: String,
+    private val _content: String,
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private var id: Long? = null,
-)
+    private val _id: Long? = null,
+) {
+    val title: String
+        get() = _title
+
+    val content: String
+        get() = _content
+
+    val id: Long?
+        get() = _id
+}

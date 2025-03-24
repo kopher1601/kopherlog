@@ -17,7 +17,10 @@ class ExceptionController {
     @ExceptionHandler
     fun invalidRequestHandler(e: MethodArgumentNotValidException): ErrorResponse? {
         log.info("invalidRequestHandler : ${e.message}")
-        val response = ErrorResponse("400", "リクエストに誤りがあります。")
+        val response = ErrorResponse(
+            _code = "400",
+            _message = "リクエストに誤りがあります。"
+        )
         e.fieldErrors.forEach { fieldError ->
             response.addValidation(fieldError.field, fieldError.defaultMessage!!)
         }
