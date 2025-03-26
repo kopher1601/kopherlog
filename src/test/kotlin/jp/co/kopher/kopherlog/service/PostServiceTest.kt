@@ -7,6 +7,8 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.data.domain.PageRequest
+import org.springframework.data.domain.Sort.Direction.DESC
 import org.springframework.test.context.TestConstructor
 import org.springframework.transaction.annotation.Transactional
 
@@ -57,20 +59,21 @@ class PostServiceTest(
     @DisplayName("글 여러 개 조회")
     fun test3() {
         // given
-        val post1 = Post(
-            _title = "foo1",
-            _content = "bar1",
-        )
-        val post2 = Post(
-            _title = "foo2",
-            _content = "bar2",
-        )
-        postRepository.saveAll(listOf(post1, post2))
+        val requestPosts = (1 until 31).map {
+            Post(
+                _title = "吉祥寺 $it",
+                _content = "マンション購入 $it",
+            )
+        }
+        postRepository.saveAll(requestPosts)
 
         // when
-        val response = postService.getList()
+        val pageable = PageRequest.of(0, 5, DESC, "id")
+        val response = postService.getList(pageable)
 
         // then
-        assertThat(response.size).isEqualTo(2)
+        assertThat(response.size).isEqualTo(5)
+        assertThat(response.get(0).title).isEqualTo("吉祥寺 30")
+        assertThat(response.get(4).title).isEqualTo("吉祥寺 26")
     }
 }

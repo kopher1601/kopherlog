@@ -9,3 +9,7 @@ spring:
     username: sa
     password:
     url: jdbc:h2:mem:kopherlog
+  data:
+    web:
+      pageable:
+        one-indexed-parameters: true
