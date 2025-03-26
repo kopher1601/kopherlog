@@ -4,11 +4,14 @@ import jp.co.kopher.kopherlog.domain.Post
 import jp.co.kopher.kopherlog.repository.PostRepository
 import jp.co.kopher.kopherlog.request.PostCreate
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.context.TestConstructor
+import org.springframework.transaction.annotation.Transactional
 
 @SpringBootTest
+@Transactional
 @TestConstructor(autowireMode = TestConstructor.AutowireMode.ALL)
 class PostServiceTest(
     private val postService: PostService,
@@ -48,5 +51,26 @@ class PostServiceTest(
         // then
         assertThat(response.title).isEqualTo("1234567890")
         assertThat(response.content).isEqualTo(post.content)
+    }
+
+    @Test
+    @DisplayName("글 여러 개 조회")
+    fun test3() {
+        // given
+        val post1 = Post(
+            _title = "foo1",
+            _content = "bar1",
+        )
+        val post2 = Post(
+            _title = "foo2",
+            _content = "bar2",
+        )
+        postRepository.saveAll(listOf(post1, post2))
+
+        // when
+        val response = postService.getList()
+
+        // then
+        assertThat(response.size).isEqualTo(2)
     }
 }

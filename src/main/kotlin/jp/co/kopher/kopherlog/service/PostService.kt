@@ -34,4 +34,8 @@ class PostService(
         )
     }
 
+    fun getList(): List<PostResponse> {
+        return postRepository.findAll().map { PostResponse.from(it) }
+    }
+
 }

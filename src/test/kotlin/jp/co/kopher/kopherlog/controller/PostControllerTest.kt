@@ -92,4 +92,30 @@ class PostControllerTest(
             .andExpect(jsonPath("$.content").value("bar"))
             .andDo(print())
     }
+
+    @Test
+    @DisplayName("글 여러 개 조회")
+    fun test5() {
+        // given
+        val post1 = Post(
+            _title = "foo1",
+            _content = "bar1",
+        )
+        val post2 = Post(
+            _title = "foo2",
+            _content = "bar2",
+        )
+        postRepository.saveAll(listOf(post1, post2))
+
+        // when
+        mockMvc.perform(
+            get("/posts")
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isOk)
+            .andExpect(jsonPath("$.length()").value(2))
+            .andExpect(jsonPath("$[0].title").value("foo1"))
+            .andExpect(jsonPath("$[0].content").value("bar1"))
+            .andDo(print())
+    }
 }

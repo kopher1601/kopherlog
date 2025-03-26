@@ -19,9 +19,13 @@ class PostController(
     }
 
     @GetMapping("/posts/{postId}")
-    fun get(@PathVariable(name = "postId") id: Long): PostResponse {
-        val response = postService.get(id)
-        return response
+    fun get(@PathVariable postId: Long): PostResponse {
+        return postService.get(postId)
+    }
+
+    @GetMapping("/posts")
+    fun getList(): List<PostResponse> {
+        return postService.getList()
     }
 
 }
