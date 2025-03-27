@@ -36,7 +36,7 @@ class PostService(
     }
 
     fun getList(pageable: Pageable): List<PostResponse> {
-        return postRepository.findAll(pageable).map { PostResponse.from(it) }.toList()
+        return postRepository.getList(1).map { PostResponse.from(it) }.toList()
     }
 
 }

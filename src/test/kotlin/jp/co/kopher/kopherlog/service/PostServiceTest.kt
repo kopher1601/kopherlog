@@ -59,7 +59,7 @@ class PostServiceTest(
     @DisplayName("글 여러 개 조회")
     fun test3() {
         // given
-        val requestPosts = (1 until 31).map {
+        val requestPosts = (0 until 20).map {
             Post(
                 _title = "吉祥寺 $it",
                 _content = "マンション購入 $it",
@@ -72,8 +72,8 @@ class PostServiceTest(
         val response = postService.getList(pageable)
 
         // then
-        assertThat(response.size).isEqualTo(5)
-        assertThat(response.get(0).title).isEqualTo("吉祥寺 30")
-        assertThat(response.get(4).title).isEqualTo("吉祥寺 26")
+        assertThat(response.size).isEqualTo(10)
+        assertThat(response.get(0).title).isEqualTo("吉祥寺 19")
+        assertThat(response.get(4).title).isEqualTo("吉祥寺 15")
     }
 }
