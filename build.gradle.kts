@@ -4,6 +4,7 @@ plugins {
     id("org.springframework.boot") version "3.4.4"
     id("io.spring.dependency-management") version "1.1.7"
     kotlin("plugin.jpa") version "1.9.25"
+    kotlin("kapt") version "1.9.25"
 }
 
 group = "jp.co.kopher"
@@ -26,6 +27,11 @@ dependencies {
     implementation("org.springframework.boot:spring-boot-starter-validation")
 
     implementation("org.jetbrains.kotlin:kotlin-reflect")
+
+    // query dsl
+    implementation("com.querydsl:querydsl-jpa:5.1.0:jakarta")
+    kapt("com.querydsl:querydsl-apt:5.1.0:jakarta")
+    kapt("org.springframework.boot:spring-boot-configuration-processor")
 
     runtimeOnly("com.h2database:h2")
     testImplementation("org.springframework.boot:spring-boot-starter-test")
