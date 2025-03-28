@@ -107,11 +107,11 @@ class PostControllerTest(
 
         // when
         mockMvc.perform(
-            get("/posts?page=1&sort=id,desc&size=5")
+            get("/posts?page=1&size=10")
                 .contentType(MediaType.APPLICATION_JSON)
         )
             .andExpect(status().isOk)
-            .andExpect(jsonPath("$.length()").value(5))
+            .andExpect(jsonPath("$.length()").value(10))
             .andExpect(jsonPath("$[0].title").value("吉祥寺 30"))
             .andExpect(jsonPath("$[0].content").value("マンション購入 30"))
             .andDo(print())

@@ -3,12 +3,11 @@ package jp.co.kopher.kopherlog.service
 import jp.co.kopher.kopherlog.domain.Post
 import jp.co.kopher.kopherlog.repository.PostRepository
 import jp.co.kopher.kopherlog.request.PostCreate
+import jp.co.kopher.kopherlog.request.PostSearch
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.data.domain.PageRequest
-import org.springframework.data.domain.Sort.Direction.DESC
 import org.springframework.test.context.TestConstructor
 import org.springframework.transaction.annotation.Transactional
 
@@ -66,10 +65,13 @@ class PostServiceTest(
             )
         }
         postRepository.saveAll(requestPosts)
+        val search = PostSearch(
+//            page = 1,
+//            size = 10,
+        )
 
         // when
-        val pageable = PageRequest.of(0, 5, DESC, "id")
-        val response = postService.getList(pageable)
+        val response = postService.getList(search)
 
         // then
         assertThat(response.size).isEqualTo(10)

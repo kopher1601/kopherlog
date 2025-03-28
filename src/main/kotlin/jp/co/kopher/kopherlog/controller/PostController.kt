@@ -2,9 +2,9 @@ package jp.co.kopher.kopherlog.controller
 
 import jakarta.validation.Valid
 import jp.co.kopher.kopherlog.request.PostCreate
+import jp.co.kopher.kopherlog.request.PostSearch
 import jp.co.kopher.kopherlog.response.PostResponse
 import jp.co.kopher.kopherlog.service.PostService
-import org.springframework.data.domain.Pageable
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 
@@ -25,8 +25,8 @@ class PostController(
     }
 
     @GetMapping("/posts")
-    fun getList(pageable: Pageable): List<PostResponse> {
-        return postService.getList(pageable)
+    fun getList(@ModelAttribute search: PostSearch): List<PostResponse> {
+        return postService.getList(search)
     }
 
 }

@@ -3,9 +3,9 @@ package jp.co.kopher.kopherlog.service
 import jp.co.kopher.kopherlog.domain.Post
 import jp.co.kopher.kopherlog.repository.PostRepository
 import jp.co.kopher.kopherlog.request.PostCreate
+import jp.co.kopher.kopherlog.request.PostSearch
 import jp.co.kopher.kopherlog.response.PostResponse
 import org.slf4j.LoggerFactory
-import org.springframework.data.domain.Pageable
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 
@@ -35,8 +35,8 @@ class PostService(
         )
     }
 
-    fun getList(pageable: Pageable): List<PostResponse> {
-        return postRepository.getList(1).map { PostResponse.from(it) }.toList()
+    fun getList(search: PostSearch): List<PostResponse> {
+        return postRepository.getList(search).map { PostResponse.from(it) }.toList()
     }
 
 }
