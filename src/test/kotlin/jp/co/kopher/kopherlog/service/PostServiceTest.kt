@@ -103,4 +103,22 @@ class PostServiceTest(
         assertThat(updatedPost.title).isEqualTo("武蔵境マンションもいいな")
         assertThat(updatedPost.content).isEqualTo("bar")
     }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    fun test6() {
+        // given
+        val post = Post(
+            _title = "123456789012345",
+            _content = "bar",
+        )
+        postRepository.save(post)
+
+        // when
+        postService.delete(post.id!!)
+
+        // then
+        assertThat(postRepository.findById(post.id!!)).isNotPresent
+    }
+
 }

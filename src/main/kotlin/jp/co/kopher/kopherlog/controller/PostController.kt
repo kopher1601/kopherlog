@@ -29,4 +29,10 @@ class PostController(
         return postService.getList(search)
     }
 
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @DeleteMapping("/posts/{postId}")
+    fun delete(@PathVariable postId: Long) {
+        postService.delete(postId)
+    }
+
 }

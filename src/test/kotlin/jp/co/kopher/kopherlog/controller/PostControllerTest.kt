@@ -12,8 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
 import org.springframework.test.context.TestConstructor
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
+import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers.print
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -116,4 +115,24 @@ class PostControllerTest(
             .andExpect(jsonPath("$[0].content").value("マンション購入 30"))
             .andDo(print())
     }
+
+    @Test
+    @DisplayName("게시글 삭제")
+    fun test8() {
+        // given
+        val post = Post(
+            _title = "123456789012345",
+            _content = "bar",
+        )
+        postRepository.save(post)
+
+        // expected
+        mockMvc.perform(
+            delete("/posts/{postId}", post.id!!)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isNoContent)
+            .andDo(print())
+    }
+
 }
