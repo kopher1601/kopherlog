@@ -3,6 +3,7 @@ package jp.co.kopher.kopherlog.service
 import jp.co.kopher.kopherlog.domain.Post
 import jp.co.kopher.kopherlog.repository.PostRepository
 import jp.co.kopher.kopherlog.request.PostCreate
+import jp.co.kopher.kopherlog.request.PostEdit
 import jp.co.kopher.kopherlog.request.PostSearch
 import jp.co.kopher.kopherlog.response.PostResponse
 import org.slf4j.LoggerFactory
@@ -37,6 +38,13 @@ class PostService(
 
     fun getList(search: PostSearch): List<PostResponse> {
         return postRepository.getList(search).map { PostResponse.from(it) }.toList()
+    }
+
+    fun edit(id: Long, postEdit: PostEdit) {
+        val post = postRepository.findByIdOrNull(id)
+            ?: throw IllegalArgumentException("Post not found")
+
+        post.edit(postEdit)
     }
 
 }

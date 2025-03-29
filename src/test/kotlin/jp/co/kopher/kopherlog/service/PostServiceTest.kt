@@ -3,6 +3,7 @@ package jp.co.kopher.kopherlog.service
 import jp.co.kopher.kopherlog.domain.Post
 import jp.co.kopher.kopherlog.repository.PostRepository
 import jp.co.kopher.kopherlog.request.PostCreate
+import jp.co.kopher.kopherlog.request.PostEdit
 import jp.co.kopher.kopherlog.request.PostSearch
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.jupiter.api.DisplayName
@@ -77,5 +78,29 @@ class PostServiceTest(
         assertThat(response.size).isEqualTo(10)
         assertThat(response.get(0).title).isEqualTo("吉祥寺 19")
         assertThat(response.get(4).title).isEqualTo("吉祥寺 15")
+    }
+
+    @Test
+    @DisplayName("글 제목 수정")
+    fun test4() {
+        // given
+        val post = Post(
+            _title = "123456789012345",
+            _content = "bar",
+        )
+        postRepository.save(post)
+
+        val postEdit = PostEdit(
+            title = "武蔵境マンションもいいな",
+            content = "bar",
+        )
+
+        // when
+        postService.edit(post.id!!, postEdit)
+
+        // then
+        val updatedPost = postRepository.findById(post.id!!).get()
+        assertThat(updatedPost.title).isEqualTo("武蔵境マンションもいいな")
+        assertThat(updatedPost.content).isEqualTo("bar")
     }
 }
