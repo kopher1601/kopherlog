@@ -135,4 +135,17 @@ class PostControllerTest(
             .andDo(print())
     }
 
+    @Test
+    @DisplayName("존재하지 않는 게시글 조회")
+    fun test9() {
+        // expected
+        mockMvc.perform(
+            delete("/posts/{postId}", 2L)
+                .contentType(MediaType.APPLICATION_JSON)
+        )
+            .andExpect(status().isNotFound)
+            .andDo(print())
+    }
+
+
 }

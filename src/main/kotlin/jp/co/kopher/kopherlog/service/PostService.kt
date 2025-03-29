@@ -1,6 +1,7 @@
 package jp.co.kopher.kopherlog.service
 
 import jp.co.kopher.kopherlog.domain.Post
+import jp.co.kopher.kopherlog.exception.PostNotFound
 import jp.co.kopher.kopherlog.repository.PostRepository
 import jp.co.kopher.kopherlog.request.PostCreate
 import jp.co.kopher.kopherlog.request.PostEdit
@@ -27,8 +28,7 @@ class PostService(
     }
 
     fun get(id: Long): PostResponse {
-        val post = postRepository.findByIdOrNull(id)
-            ?: throw IllegalArgumentException("Post not found")
+        val post = postRepository.findByIdOrNull(id) ?: throw PostNotFound()
 
         return PostResponse(
             id = post.id!!,
@@ -43,15 +43,13 @@ class PostService(
 
     @Transactional
     fun edit(id: Long, postEdit: PostEdit) {
-        val post = postRepository.findByIdOrNull(id)
-            ?: throw IllegalArgumentException("Post not found")
+        val post = postRepository.findByIdOrNull(id) ?: throw PostNotFound()
 
         post.edit(postEdit)
     }
 
     fun delete(id: Long) {
-        val post = postRepository.findByIdOrNull(id)
-            ?: throw IllegalArgumentException("Post not found")
+        val post = postRepository.findByIdOrNull(id) ?: throw PostNotFound()
 
         postRepository.delete(post)
     }

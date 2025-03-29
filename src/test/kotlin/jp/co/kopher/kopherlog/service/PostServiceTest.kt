@@ -1,11 +1,13 @@
 package jp.co.kopher.kopherlog.service
 
 import jp.co.kopher.kopherlog.domain.Post
+import jp.co.kopher.kopherlog.exception.PostNotFound
 import jp.co.kopher.kopherlog.repository.PostRepository
 import jp.co.kopher.kopherlog.request.PostCreate
 import jp.co.kopher.kopherlog.request.PostEdit
 import jp.co.kopher.kopherlog.request.PostSearch
 import org.assertj.core.api.Assertions.assertThat
+import org.assertj.core.api.Assertions.assertThatThrownBy
 import org.junit.jupiter.api.DisplayName
 import org.junit.jupiter.api.Test
 import org.springframework.boot.test.context.SpringBootTest
@@ -119,6 +121,22 @@ class PostServiceTest(
 
         // then
         assertThat(postRepository.findById(post.id!!)).isNotPresent
+    }
+
+    @Test
+    @DisplayName("getPost")
+    fun test7() {
+        // given
+        val post = Post(
+            _title = "123456789012345",
+            _content = "bar",
+        )
+        postRepository.save(post)
+
+        // expected
+        assertThatThrownBy { postService.get(2L) }
+            .isInstanceOf(PostNotFound::class.java)
+            .hasMessage("Post not found")
     }
 
 }
