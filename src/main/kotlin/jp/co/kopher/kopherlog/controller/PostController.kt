@@ -13,6 +13,7 @@ class PostController(
     private val postService: PostService,
 ) {
 
+
     @ResponseStatus(HttpStatus.CREATED)
     @PostMapping("/posts")
     fun post(@RequestBody @Valid request: PostCreate) {
