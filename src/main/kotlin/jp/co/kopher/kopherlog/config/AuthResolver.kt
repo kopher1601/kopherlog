@@ -1,7 +1,9 @@
 package jp.co.kopher.kopherlog.config
 
 import jp.co.kopher.kopherlog.config.data.UserSession
+import jp.co.kopher.kopherlog.exception.Unauthorized
 import org.springframework.core.MethodParameter
+import org.springframework.http.HttpHeaders
 import org.springframework.web.bind.support.WebDataBinderFactory
 import org.springframework.web.context.request.NativeWebRequest
 import org.springframework.web.method.support.HandlerMethodArgumentResolver
@@ -17,8 +19,11 @@ class AuthResolver : HandlerMethodArgumentResolver {
         mavContainer: ModelAndViewContainer?,
         webRequest: NativeWebRequest,
         binderFactory: WebDataBinderFactory?
-    ): Any? {
+    ): Any {
+        val accessToken = webRequest.getHeader(HttpHeaders.AUTHORIZATION) ?: throw Unauthorized()
 
-        return null
+        // TODO DB でユーザー確認
+
+        return UserSession(1L)
     }
 }
