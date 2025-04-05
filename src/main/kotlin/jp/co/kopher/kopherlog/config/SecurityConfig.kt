@@ -29,6 +29,12 @@ class SecurityConfig {
             .authorizeHttpRequests {
                 it.requestMatchers(HttpMethod.GET, "/auth/login").permitAll()
             }
+            .formLogin {
+                it.loginPage("/auth/login").permitAll()
+                it.loginProcessingUrl("/auth/login").permitAll() //
+                it.usernameParameter("username").passwordParameter("password")
+                it.defaultSuccessUrl("/")
+            }
             .csrf {
                 it.disable()
             }
